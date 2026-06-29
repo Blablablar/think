@@ -3,9 +3,9 @@ const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 const _ = db.command;
-const $ = db.command.aggregate;
 
-const DEFAULT_AVATAR = 'https://mmbiz.qpic.cn/mmbiz/iaiam7P5IgL4ST06qRGpAy4tLZuUcpZDliaCpxw6ianL7Q1BiciaF4ickggFKPvTLibIyjTQJeJWGDRc0icia07Rmic9XGTZw/0';
+// 云存储中的默认头像 fileID
+const DEFAULT_AVATAR = 'cloud://cloud1-2gt03efv3c08ce28.636c-cloud1-2gt03efv3c08ce28-1256535077/assets/default-avatar.png';
 
 exports.main = async (event, context) => {
   try {
@@ -30,6 +30,13 @@ exports.main = async (event, context) => {
       };
     } else {
       userRecord = userResult.data[0];
+      // 修复旧用户的无效头像 URL（mmbiz.qpic.cn 已失效）
+      if (!userRecord.avatarUrl || userRecord.avatarUrl.indexOf('mmbiz.qpic.cn') !== -1) {
+        await db.collection('users').doc(userRecord._id).update({
+          data: { avatarUrl: DEFAULT_AVATAR }
+        });
+        userRecord.avatarUrl = DEFAULT_AVATAR;
+      }
     }
 
     return { code: 0, message: 'ok', data: userRecord };

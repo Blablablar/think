@@ -9,7 +9,8 @@
 
     <!-- 已登录：显示用户信息 -->
     <view class="profile-info" wx:if="{{hasLogin}}" bindtap="onEditProfile">
-      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      <image wx:if="{{userInfo.avatarUrl}}" class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      <view wx:else class="avatar avatar-default">👤</view>
       <view class="profile-text">
         <view class="nickname">{{userInfo.nickName}}</view>
         <view class="profile-stats">
@@ -33,15 +34,34 @@
     <view class="login-area" wx:else>
       <view class="login-avatar">👤</view>
       <view class="login-tip">登录后查看你的创意世界</view>
-      <button class="login-btn" open-type="getUserInfo" bindgetuserinfo="onLogin">
+      <button class="login-btn" bindtap="onLogin">
         <text class="login-icon">💚</text>
         <text>微信一键登录</text>
       </button>
     </view>
   </view>
 
+  <!-- 编辑资料弹窗 -->
+  <view class="edit-mask" wx:if="{{editVisible}}" bindtap="onCloseEdit">
+    <view class="edit-dialog" catchtap>
+      <view class="edit-title">编辑个人资料</view>
+      <button class="edit-avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onEditChooseAvatar">
+        <image wx:if="{{editAvatarUrl}}" class="edit-avatar-img" src="{{editAvatarUrl}}" mode="aspectFill"></image>
+        <view wx:else class="edit-avatar-placeholder">
+          <view class="edit-avatar-add">+</view>
+          <view class="edit-avatar-tip">点击选择头像</view>
+        </view>
+      </button>
+      <input class="edit-nickname" type="nickname" placeholder="请输入昵称" value="{{editNickName}}" bindinput="onEditNicknameInput" />
+      <view class="edit-actions">
+        <button class="edit-cancel-btn" bindtap="onCloseEdit">取消</button>
+        <button class="edit-save-btn" bindtap="onSaveProfile" loading="{{savingProfile}}">保存</button>
+      </view>
+    </view>
+  </view>
+
   <!-- 主 Tab 切换 -->
-  <scroll-view scroll-x class="tabs">
+  <scroll-view scroll-x enable-flex class="tabs">
     <view
       wx:for="{{tabs}}"
       wx:key="key"
@@ -66,7 +86,7 @@
   </view>
 
   <!-- 列表 -->
-  <scroll-view scroll-y class="list">
+  <scroll-view scroll-y enable-flex class="list">
     <block wx:if="{{loading}}">
       <view class="loading-tip">加载中...</view>
     </block>

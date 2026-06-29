@@ -8,7 +8,9 @@
 
 .content {
   flex: 1;
-  padding: 24rpx 32rpx 160rpx;
+  padding: 24rpx 32rpx;
+  /* 底部需留出 tabBar(120rpx+safe) + 操作栏(144rpx) 的空间 */
+  padding-bottom: calc(264rpx + env(safe-area-inset-bottom));
   height: calc(100vh - 160rpx);
   box-sizing: border-box;
 }
@@ -136,7 +138,8 @@
 
 .bottom-bar {
   position: fixed;
-  bottom: 0;
+  /* 上移到自定义 tabBar 上方，避免被遮挡 */
+  bottom: calc(120rpx + env(safe-area-inset-bottom));
   left: 0;
   right: 0;
   display: flex;

@@ -1,9 +1,16 @@
 <!-- components/tag-selector/index.wxml -->
+<wxs module="util">
+  function isSelected(arr, val) {
+    if (!arr) return false
+    return arr.indexOf(val) !== -1
+  }
+  module.exports = { isSelected: isSelected }
+</wxs>
 <view class="tag-cloud">
   <view
     wx:for="{{tags}}"
     wx:key="*this"
-    class="tag-item {{selectedTags.includes(item) ? 'selected' : ''}}"
+    class="tag-item {{util.isSelected(selectedTags, item) ? 'selected' : ''}}"
     bindtap="onToggle"
     data-tag="{{item}}"
   >{{item}}</view>

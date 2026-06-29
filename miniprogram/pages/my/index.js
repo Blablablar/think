@@ -1,6 +1,9 @@
 // pages/my/index.js
 const { callFunction, showToast, showLoading, hideLoading } = require('../../utils/cloud.js')
 
+// 云存储默认头像 fileID（与 initUserProfile 云函数一致）
+const DEFAULT_AVATAR = 'cloud://cloud1-2gt03efv3c08ce28.636c-cloud1-2gt03efv3c08ce28-1256535077/assets/default-avatar.png'
+
 Page({
   data: {
     hasLogin: false,
@@ -14,6 +17,12 @@ Page({
     publishedCount: 0,
     implCount: 0,
     likeCount: 0,
+    // 编辑资料相关
+    editVisible: false,
+    editAvatarUrl: '',
+    editNickName: '',
+    avatarChanged: false,
+    savingProfile: false,
     tabs: [
       { key: 'published', label: '我发布的' },
       { key: 'implemented', label: '我实现的' },
@@ -38,60 +47,119 @@ Page({
   checkLoginStatus() {
     const app = getApp()
     const userInfo = wx.getStorageSync('userInfo')
-    if (userInfo && userInfo.nickName && userInfo.nickName !== '微信用户') {
+    const hasLogged = wx.getStorageSync('hasLogged')
+    if (hasLogged && userInfo) {
       this.setData({ hasLogin: true, userInfo })
-    } else if (app.globalData.userInfo && app.globalData.userInfo.nickName !== '微信用户') {
+    } else if (hasLogged && app.globalData.userInfo) {
       this.setData({ hasLogin: true, userInfo: app.globalData.userInfo })
     }
   },
 
-  // 微信一键登录
-  async onLogin(e) {
-    // 兼容 getUserInfo 回调
-    if (e.detail.errMsg && e.detail.errMsg.indexOf('deny') !== -1) {
-      showToast('您取消了授权')
+  // 微信一键登录（直接登录，使用默认头像）
+  onLogin() {
+    const app = getApp()
+    const userInfo = {
+      ...(app.globalData.userInfo || {}),
+      nickName: (app.globalData.userInfo && app.globalData.userInfo.nickName) || '微信用户',
+      avatarUrl: (app.globalData.userInfo && app.globalData.userInfo.avatarUrl) || DEFAULT_AVATAR
+    }
+    app.globalData.userInfo = userInfo
+    wx.setStorageSync('userInfo', userInfo)
+    wx.setStorageSync('hasLogged', true)
+
+    this.setData({ hasLogin: true, userInfo })
+    showToast('登录成功', 'success')
+
+    this.loadData()
+    this.loadNotifications()
+  },
+
+  // 打开编辑资料弹窗
+  onEditProfile() {
+    const { userInfo } = this.data
+    this.setData({
+      editVisible: true,
+      editAvatarUrl: userInfo.avatarUrl || '',
+      editNickName: userInfo.nickName || '',
+      avatarChanged: false
+    })
+  },
+
+  // 关闭编辑资料弹窗
+  onCloseEdit() {
+    this.setData({ editVisible: false })
+  },
+
+  // 选择微信头像（编辑资料弹窗内）
+  onEditChooseAvatar(e) {
+    this.setData({
+      editAvatarUrl: e.detail.avatarUrl,
+      avatarChanged: true
+    })
+  },
+
+  // 昵称输入
+  onEditNicknameInput(e) {
+    this.setData({ editNickName: e.detail.value })
+  },
+
+  // 保存个人资料
+  async onSaveProfile() {
+    const { editAvatarUrl, editNickName, avatarChanged } = this.data
+    if (!editNickName.trim()) {
+      showToast('请输入昵称')
       return
     }
 
-    // 优先使用 wx.getUserProfile（推荐方式，会弹窗确认）
+    this.setData({ savingProfile: true })
+    showLoading('保存中...')
     try {
-      const { userInfo } = await wx.getUserProfile({
-        desc: '用于完善个人资料',
-        lang: 'zh_CN'
-      })
+      let avatarUrl = editAvatarUrl
 
-      showLoading('登录中...')
-      // 调用云函数更新用户资料
+      // 如果选择了新头像，上传到云存储
+      if (avatarChanged && editAvatarUrl) {
+        const cloudPath = `avatars/${Date.now()}_${Math.floor(Math.random() * 1000)}.jpg`
+        const uploadRes = await new Promise((resolve, reject) => {
+          wx.cloud.uploadFile({
+            cloudPath,
+            filePath: editAvatarUrl,
+            success: resolve,
+            fail: reject
+          })
+        })
+        avatarUrl = uploadRes.fileID
+      }
+
+      // 调用云函数更新资料
       await callFunction('updateUserProfile', {
-        nickName: userInfo.nickName,
-        avatarUrl: userInfo.avatarUrl
+        nickName: editNickName.trim(),
+        avatarUrl
       })
 
-      // 缓存用户信息
+      // 更新缓存
       const app = getApp()
       const newUserInfo = {
-        ...app.globalData.userInfo,
-        nickName: userInfo.nickName,
-        avatarUrl: userInfo.avatarUrl
+        ...(app.globalData.userInfo || {}),
+        nickName: editNickName.trim(),
+        avatarUrl
       }
       app.globalData.userInfo = newUserInfo
       wx.setStorageSync('userInfo', newUserInfo)
 
       hideLoading()
-      this.setData({ hasLogin: true, userInfo: newUserInfo })
-      showToast('登录成功', 'success')
-
-      // 登录后加载数据
-      this.loadData()
-      this.loadNotifications()
+      this.setData({
+        hasLogin: true,
+        userInfo: newUserInfo,
+        editVisible: false,
+        avatarChanged: false
+      })
+      showToast('保存成功', 'success')
     } catch (err) {
       hideLoading()
-      console.error('[My] login failed:', err)
-      if (err.errMsg && err.errMsg.indexOf('deny') !== -1) {
-        showToast('您取消了授权')
-      } else {
-        showToast('登录失败')
-      }
+      console.error('[My] saveProfile failed:', err)
+      showToast('保存失败')
+    } finally {
+      this.setData({ savingProfile: false })
     }
   },
 

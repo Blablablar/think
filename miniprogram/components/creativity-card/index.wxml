@@ -2,7 +2,8 @@
 <view class="card" bindtap="onCardClick">
   <!-- 作者信息 -->
   <view class="author" wx:if="{{showAuthor}}">
-    <image class="avatar" src="{{data.author.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+    <image wx:if="{{data.author.avatarUrl}}" class="avatar" src="{{data.author.avatarUrl}}" mode="aspectFill"></image>
+    <view wx:else class="avatar avatar-default">👤</view>
     <text class="nickname ellipsis">{{data.author.nickName || '微信用户'}}</text>
     <text class="time">{{data.date}}</text>
   </view>

@@ -116,6 +116,135 @@
   flex-shrink: 0;
 }
 
+.avatar-default {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #dfe6e9;
+  font-size: 64rpx;
+}
+
+/* 编辑资料弹窗 */
+.edit-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-dialog {
+  width: 600rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.edit-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 32rpx;
+}
+
+.edit-avatar-btn {
+  width: 160rpx;
+  height: 160rpx;
+  padding: 0;
+  margin-bottom: 32rpx;
+  border-radius: 999rpx;
+  background: #f2f3f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  line-height: normal;
+}
+
+.edit-avatar-btn::after {
+  border: none;
+}
+
+.edit-avatar-img {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 999rpx;
+}
+
+.edit-avatar-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #b2bec3;
+}
+
+.edit-avatar-add {
+  font-size: 56rpx;
+  line-height: 1;
+  margin-bottom: 4rpx;
+}
+
+.edit-avatar-tip {
+  font-size: 20rpx;
+}
+
+.edit-nickname {
+  width: 100%;
+  height: 80rpx;
+  background: #f8f9fe;
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #1a1a2e;
+  margin-bottom: 32rpx;
+  box-sizing: border-box;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 24rpx;
+  width: 100%;
+}
+
+.edit-cancel-btn {
+  flex: 1;
+  height: 80rpx;
+  background: #f2f3f5;
+  color: #636e72;
+  font-size: 28rpx;
+  border-radius: 999rpx;
+  line-height: 80rpx;
+  padding: 0;
+}
+
+.edit-cancel-btn::after {
+  border: none;
+}
+
+.edit-save-btn {
+  flex: 1;
+  height: 80rpx;
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 500;
+  border-radius: 999rpx;
+  line-height: 80rpx;
+  padding: 0;
+}
+
+.edit-save-btn::after {
+  border: none;
+}
+
 .profile-text {
   flex: 1;
   min-width: 0;

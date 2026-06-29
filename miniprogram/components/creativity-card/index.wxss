@@ -21,6 +21,14 @@
   flex-shrink: 0;
 }
 
+.avatar-default {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #dfe6e9;
+  font-size: 32rpx;
+}
+
 .nickname {
   font-size: 28rpx;
   font-weight: 500;
