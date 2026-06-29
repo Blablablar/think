@@ -1,0 +1,64 @@
+const cloud = require('wx-server-sdk')
+cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
+const db = cloud.database()
+const _ = db.command
+const $ = db.command.aggregate
+
+exports.main = async (event, context) => {
+  const { OPENID } = cloud.getWXContext()
+  const { creativityId } = event
+  const page = event.page || 1
+  const pageSize = event.pageSize || 10
+
+  if (!creativityId) {
+    return { code: -1, message: '缺少 creativityId', data: null }
+  }
+
+  try {
+    // 查询总数（已审核通过）
+    const countRes = await db.collection('implementations').where({
+      creativityId,
+      videoStatus: 'approved'
+    }).count()
+
+    const total = countRes.total
+
+    // 分页查询
+    const listRes = await db.collection('implementations')
+      .where({
+        creativityId,
+        videoStatus: 'approved'
+      })
+      .orderBy('createdAt', 'desc')
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .get()
+
+    const list = listRes.data
+
+    // lookup users 拿作者信息
+    const openids = [...new Set(list.map(item => item._openid))]
+    let userMap = {}
+
+    if (openids.length > 0) {
+      const usersRes = await db.collection('users').where({
+        _openid: _.in(openids)
+      }).get()
+      userMap = usersRes.data.reduce((acc, cur) => {
+        acc[cur._openid] = cur
+        return acc
+      }, {})
+    }
+
+    const resultList = list.map(item => ({
+      ...item,
+      author: userMap[item._openid] || null
+    }))
+
+    const hasMore = (page - 1) * pageSize + list.length < total
+
+    return { code: 0, message: 'ok', data: { list: resultList, total, hasMore } }
+  } catch (err) {
+    return { code: -1, message: err.message || '查询失败', data: null }
+  }
+}

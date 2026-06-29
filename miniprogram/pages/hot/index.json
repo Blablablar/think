@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "热门创意",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "creativity-card": "/components/creativity-card/index",
+    "empty-state": "/components/empty-state/index"
+  }
+}

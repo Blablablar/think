@@ -1,0 +1,22 @@
+/* components/tag-selector/index.wxss */
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.tag-item {
+  padding: 8rpx 24rpx;
+  background: #f2f3f5;
+  color: #636e72;
+  font-size: 24rpx;
+  border-radius: 999rpx;
+  border: 2rpx solid transparent;
+}
+
+.tag-item.selected {
+  background: #f0f0ff;
+  color: #6c5ce7;
+  border-color: #6c5ce7;
+  font-weight: 500;
+}

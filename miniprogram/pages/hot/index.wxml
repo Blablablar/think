@@ -1,0 +1,44 @@
+<!-- pages/hot/index.wxml -->
+<view class="page">
+  <view class="header">
+    <view class="header-title"><text class="fire-icon">🔥</text> 热门创意</view>
+    <view class="header-sub">最受大家喜欢的创意灵感</view>
+  </view>
+
+  <scroll-view
+    scroll-y
+    class="list"
+    bindscrolltolower="onReachBottom"
+    refresher-enabled
+    refresher-triggered="{{refreshing}}"
+    bindrefresherrefresh="onPullDownRefresh"
+  >
+    <block wx:if="{{list.length > 0}}">
+      <view class="rank-card" wx:for="{{list}}" wx:key="_id" wx:for-index="idx">
+        <view class="rank-num {{idx === 0 ? 'top1' : ''}} {{idx === 1 ? 'top2' : ''}} {{idx === 2 ? 'top3' : ''}}">
+          {{idx + 1}}
+        </view>
+        <view class="card-wrapper">
+          <creativity-card
+            data="{{item}}"
+            bind:click="onCardClick"
+            bind:like="onLike"
+            bind:dislike="onDislike"
+            bind:tagclick="onTagClick"
+          ></creativity-card>
+          <view class="hot-bar">
+            <view class="hot-bar-fill" style="width: {{item.likeCount / maxHot * 100}}%"></view>
+          </view>
+        </view>
+      </view>
+      <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
+      <view class="loading-tip" wx:if="{{!hasMore && list.length > 0}}">没有更多了</view>
+    </block>
+
+    <empty-state
+      wx:if="{{list.length === 0 && !loading}}"
+      icon="🔥"
+      text="暂无热门创意"
+    ></empty-state>
+  </scroll-view>
+</view>

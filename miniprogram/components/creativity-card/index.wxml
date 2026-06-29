@@ -1,0 +1,59 @@
+<!-- components/creativity-card/index.wxml -->
+<view class="card" bindtap="onCardClick">
+  <!-- 作者信息 -->
+  <view class="author" wx:if="{{showAuthor}}">
+    <image class="avatar" src="{{data.author.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+    <text class="nickname ellipsis">{{data.author.nickName || '微信用户'}}</text>
+    <text class="time">{{data.date}}</text>
+  </view>
+
+  <!-- 创意内容 -->
+  <view class="content ellipsis-3">{{data.content}}</view>
+
+  <!-- 图片网格 -->
+  <view class="image-grid" wx:if="{{data.images.length > 0}}">
+    <image
+      wx:for="{{data.images}}"
+      wx:key="*this"
+      wx:if="{{index < 3}}"
+      class="image"
+      src="{{item}}"
+      mode="aspectFill"
+      lazy-load
+      bindtap="onPreviewImage"
+      data-index="{{index}}"
+    ></image>
+    <view class="image-more" wx:if="{{data.images.length > 3}}">
+      +{{data.images.length - 3}}
+    </view>
+  </view>
+
+  <!-- 标签 -->
+  <view class="tags" wx:if="{{data.tags.length > 0}}">
+    <view
+      wx:for="{{data.tags}}"
+      wx:key="*this"
+      class="tag"
+      catchtap="onTagClick"
+      data-tag="{{item}}"
+    >{{item}}</view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="footer">
+    <view class="stats">
+      <view class="btn {{data.isLiked ? 'btn-active' : ''}}" catchtap="onLike">
+        <text class="btn-icon">♡</text>
+        <text class="btn-text">{{data.likeCount}}</text>
+      </view>
+      <view class="btn {{data.isDisliked ? 'btn-dislike' : ''}}" catchtap="onDislike">
+        <text class="btn-icon">✗</text>
+        <text class="btn-text">{{data.dislikeCount}}</text>
+      </view>
+      <view class="stat-item">认领 {{data.claimCount}}</view>
+    </view>
+    <view class="fav-btn {{data.isFavorited ? 'fav-active' : ''}}" catchtap="onFavorite">
+      {{data.isFavorited ? '★' : '☆'}}
+    </view>
+  </view>
+</view>

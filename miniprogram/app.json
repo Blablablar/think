@@ -1,0 +1,38 @@
+{
+  "pages": [
+    "pages/today/index",
+    "pages/hot/index",
+    "pages/recommend/index",
+    "pages/publish/index",
+    "pages/my/index",
+    "pages/detail/index",
+    "pages/tag/index",
+    "pages/submitImpl/index",
+    "pages/search/index",
+    "pages/user/index",
+    "pages/messages/index"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#6c5ce7",
+    "navigationBarTitleText": "灵光",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#b2bec3",
+    "selectedColor": "#6c5ce7",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/today/index", "text": "今日" },
+      { "pagePath": "pages/hot/index", "text": "热门" },
+      { "pagePath": "pages/publish/index", "text": "发布" },
+      { "pagePath": "pages/recommend/index", "text": "推荐" },
+      { "pagePath": "pages/my/index", "text": "我的" }
+    ],
+    "custom": true
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "cloud": true
+}

@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "今日创意",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "creativity-card": "/components/creativity-card/index",
+    "empty-state": "/components/empty-state/index"
+  }
+}

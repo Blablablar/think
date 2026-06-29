@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "探索创意",
+  "usingComponents": {
+    "empty-state": "/components/empty-state/index"
+  }
+}

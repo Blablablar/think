@@ -1,0 +1,73 @@
+/* custom-tab-bar/index.wxss */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120rpx;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  z-index: 999;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  /* 为 iPhone X 等留出底部安全区 */
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: content-box;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100rpx;
+  position: relative;
+}
+
+.center-slot {
+  /* 中间位置只占位，不显示内容 */
+}
+
+.tab-icon {
+  font-size: 40rpx;
+  margin-bottom: 4rpx;
+  color: #b2bec3;
+  line-height: 1;
+}
+
+.tab-text {
+  font-size: 20rpx;
+  color: #b2bec3;
+}
+
+.tab-item.active .tab-icon,
+.tab-item.active .tab-text {
+  color: #6c5ce7;
+}
+
+/* 中央凸起按钮 - 绝对定位居中 */
+.center-btn {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -40rpx;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(108, 92, 231, 0.4);
+  z-index: 10;
+}
+
+.center-plus {
+  font-size: 64rpx;
+  color: #ffffff;
+  font-weight: 300;
+  line-height: 1;
+  /* 微调加号视觉居中 */
+  margin-top: -6rpx;
+}

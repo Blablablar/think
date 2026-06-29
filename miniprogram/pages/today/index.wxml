@@ -1,0 +1,44 @@
+<!-- pages/today/index.wxml -->
+<view class="page">
+  <!-- 渐变头部 -->
+  <view class="header">
+    <view class="header-title">今日创意</view>
+    <view class="header-date">{{today}}</view>
+    <view class="search-bar" bindtap="onSearchClick">
+      <text class="search-icon">🔍</text>
+      <text class="search-text">搜索创意灵感...</text>
+    </view>
+  </view>
+
+  <!-- 创意列表 -->
+  <scroll-view
+    scroll-y
+    class="list"
+    bindscrolltolower="onReachBottom"
+    refresher-enabled
+    refresher-triggered="{{refreshing}}"
+    bindrefresherrefresh="onPullDownRefresh"
+  >
+    <block wx:if="{{list.length > 0}}">
+      <creativity-card
+        wx:for="{{list}}"
+        wx:key="_id"
+        data="{{item}}"
+        bind:click="onCardClick"
+        bind:like="onLike"
+        bind:dislike="onDislike"
+        bind:favorite="onFavorite"
+        bind:tagclick="onTagClick"
+      ></creativity-card>
+      <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
+      <view class="loading-tip" wx:if="{{!hasMore && list.length > 0}}">没有更多了</view>
+    </block>
+
+    <empty-state
+      wx:if="{{list.length === 0 && !loading}}"
+      icon="💡"
+      text="今天还没有创意"
+      sub-text="快来发布第一个吧"
+    ></empty-state>
+  </scroll-view>
+</view>

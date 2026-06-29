@@ -1,0 +1,10 @@
+<!-- components/tag-selector/index.wxml -->
+<view class="tag-cloud">
+  <view
+    wx:for="{{tags}}"
+    wx:key="*this"
+    class="tag-item {{selectedTags.includes(item) ? 'selected' : ''}}"
+    bindtap="onToggle"
+    data-tag="{{item}}"
+  >{{item}}</view>
+</view>

@@ -1,0 +1,6 @@
+<!-- components/empty-state/index.wxml -->
+<view class="container">
+  <view class="icon">{{icon}}</view>
+  <view class="text">{{text}}</view>
+  <view class="sub-text" wx:if="{{subText}}">{{subText}}</view>
+</view>

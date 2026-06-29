@@ -1,0 +1,60 @@
+<!-- pages/publish/index.wxml -->
+<view class="page">
+  <scroll-view scroll-y class="content">
+    <!-- 文本输入 -->
+    <view class="content-card">
+      <textarea
+        class="text-area"
+        placeholder="分享你的创意灵感..."
+        value="{{content}}"
+        bindinput="onContentInput"
+        maxlength="{{maxContent}}"
+        auto-height
+      ></textarea>
+      <view class="char-count">{{content.length}}/{{maxContent}}</view>
+    </view>
+
+    <!-- 语音按钮 -->
+    <view class="content-card">
+      <view class="voice-btn" bindtap="onVoiceClick">
+        <view class="mic-icon">🎤</view>
+        <view class="voice-text">点击或长按录音</view>
+      </view>
+    </view>
+
+    <!-- 图片上传 -->
+    <view class="content-card">
+      <view class="section-label">配图（可选）</view>
+      <view class="image-grid">
+        <view class="image-item" wx:for="{{images}}" wx:key="*this">
+          <image class="image-preview" src="{{item}}" mode="aspectFill"></image>
+          <view class="image-delete" catchtap="onDeleteImage" data-index="{{index}}">✕</view>
+        </view>
+        <view class="add-image" wx:if="{{images.length < 9}}" bindtap="onChooseImage">
+          <view class="add-icon">+</view>
+          <view class="add-text">添加图片</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 标签选择 -->
+    <view class="content-card">
+      <view class="section-label">选择标签（必选）</view>
+      <tag-selector
+        selected-tags="{{selectedTags}}"
+        bind:change="onTagsChange"
+      ></tag-selector>
+    </view>
+  </scroll-view>
+
+  <!-- 底部按钮 -->
+  <view class="bottom-bar">
+    <button class="draft-btn" bindtap="onSaveDraft" disabled="{{publishing}}">保存草稿</button>
+    <button
+      class="publish-btn"
+      bindtap="onPublish"
+      loading="{{publishing}}"
+      disabled="{{publishing}}"
+    >{{publishing ? '发布中...' : '发布创意'}}</button>
+  </view>
+</view>

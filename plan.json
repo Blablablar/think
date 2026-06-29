@@ -1,0 +1,239 @@
+{
+  "id": "36aa6c2b25ae4a79a4e88bac7cc56a97",
+  "name": "wechat-mini-program-ideas",
+  "overview": "最终版：微信小程序创意共创社区。含发布创意（400字限制）、评论、内容审核、认领实现（7天时效）、点赞点踩（事务互斥）、标签浏览、编辑删除、用户系统、互动记录查看、关键词搜索、收藏、消息通知、社交分享、用户主页、关注用户。五Tab结构。10个集合35个云函数11个页面。",
+  "status": "ready",
+  "parts": [
+    "req",
+    "tech",
+    "design",
+    "extensions",
+    "todos"
+  ],
+  "hasConfirmed": false,
+  "content": "# 灵光 / Lighght\n\n## 产品概述\n\n灵光（Lighght）—— 一款创意共创微信小程序，用户通过文字、语音或图片发布创意灵感，其他用户可认领创意并提交实现成果（截图+视频+文字说明），形成\"一个创意，多种实现\"的社区共创模式。支持评论互动和内容安全审核。首页展示今日新鲜创意（当日无数据时fallback近3天），支持热度排行与随机推荐（去重），点赞/点踩社区互动。创意按应用市场22个分类标签归类，支持标签浏览。用户可编辑头像昵称，管理自己发布的创意和实现成果，查看互动记录，支持取消认领。\n\n## 核心功能\n\n### 创意发布\n\n- 手动文字输入（多行文本），发布前msgSecCheck审核\n- 语音输入：wx.getRecorderManager录音→上传云存储→speechToText云函数转文字（主方案CloudBase AI，降级微信同声传译插件）\n- 上传图片：wx.chooseMedia选择→前端压缩1920px→上传云存储临时目录→imgSecCheck审核→通过后移正式目录，不通过则删除\n- 必选标签，按应用市场22个分类体系（游戏、社交、购物、教育、工具、生活、娱乐、新闻、音乐、视频、摄影、效率、健康、美食、旅游、金融、图书、导航、体育、商务、天气、医疗）\n- 用户可编辑和删除自己发布的创意（删除时级联清除关联数据）\n\n### 首页 - 今日创意（Tab1）\n\n- 当天创意列表，每条附带发布者头像昵称、当前用户点赞状态(isLiked/isDisliked)\n- 显示内容摘要、图片缩略图网格、标签胶囊（可点击跳转标签浏览页）、点赞/点踩数、认领人数\n- 下拉刷新，按发布时间倒序。当日无数据自动fallback查询近3天创意\n\n### 热门栏目（Tab2）\n\n- 按点赞数降序排列，附带发布者信息和点赞状态\n- 热度进度条（点赞数-点踩数），触底分页加载\n\n### 推荐栏目（Tab3）\n\n- 随机展示（count→随机offset→skip+limit降级方案），附带点赞状态\n- 前端缓存已展示ID数组，换一批时去重\n- 单张大卡片居中，翻转切换动效\n\n### 互动功能\n\n- 点赞/点踩互斥，toggleLike原子操作，userLikes唯一索引去重\n- 实现成果单独点赞toggleImplLike\n- 所有返回列表/详情的接口注入当前用户点赞状态，前端据此高亮按钮\n\n### 评论系统\n\n- 创意详情页底部评论区块：每条评论含头像+昵称+时间+内容\n- addComment云函数：发布前msgSecCheck审核文本，通过后写入comments集合\n- getComments云函数：按creativityId查询+关联users注入头像昵称+分页\n- deleteComment云函数：删除自己的评论（或创意作者可删除）\n- 默认展示最新3条评论，\"查看全部N条\"展开\n\n### 内容审核\n\n- security.msgSecCheck：审核昵称、创意内容、实现描述、评论内容，违规则拒绝并返回错误码\n- security.imgSecCheck：审核头像、创意配图、实现截图。先上传temp目录→调用审核→通过移正式目录，不通过删除temp文件\n- security.mediaCheckAsync：异步审核实现成果视频，标记pending_review状态\n\n### 多人认领与实现成果\n\n- claimCreativity云函数校验唯一索引去重，写入claims+claimCount+1\n- 提交成果：文字描述（msgSecCheck审核）+截图≤9张（imgSecCheck审核）+视频≤30s（mediaCheckAsync异步审核）\n- 版本迭代（version递增），成果默认折叠前3个+展开全部\n- cancelClaim：已认领但未提交成果时可取消，删除claim+claimCount-1\n- 可编辑和删除自己的实现成果\n\n### 标签浏览\n\n- 点击标签跳转标签浏览页，getCreativitiesByTag支持page/pageSize/sortBy分页\n- 排序切换（最新/最热），复用creativity-card组件\n\n### 创意详情页\n\n- swiper图片轮播、完整文字+语音播放条、标签胶囊栏（可点击跳转）\n- 发布者头像昵称+时间+认领人数，点赞/点踩高亮\n- 认领按钮区：未认领→\"我要实现\"、已认领无成果→\"取消认领\"、已提交→\"更新实现成果\"\n- 实现成果列表区：默认折叠前3个+展开全部，含描述+截图9宫格+视频+点赞状态+版本标签\n- 评论区块：最新3条评论+展开全部+分页加载+底部评论输入框\n- 作者可见编辑/删除按钮\n\n### 我的页面（Tab5）\n\n- 用户头像圆形+昵称卡片（紫蓝渐变），点击弹出编辑面板（chooseAvatar+nickname input）\n- 三栏切换：「我发布的」「我实现的」「我的互动」\n- 我发布的：创意卡片列表含编辑/删除入口\n- 我实现的：创意标题+成果摘要+版本号含编辑/删除入口\n- 我的互动：分两子栏「我点赞的」「我评论的」，复用creativity-card组件展示关联创意列表\n\n### 互动记录查看（新增）\n\n- getMyLikedCreativities云函数：按_openid查userLikes(type=\"like\")→提取creativityId批量查creativities→关联users注入发布者头像昵称→分页返回\n- getMyCommentedCreativities云函数：按_openid查comments→提取creativityId去重→批量查creativities→关联users→分页返回\n- 前端在我互动页展示创意卡片列表，点击可跳转详情页\n\n## 技术栈\n\n- 前端框架：微信小程序原生框架（WXML+WXSS+JavaScript）\n- 后端服务：腾讯云开发 CloudBase（云函数+云数据库+云存储+AI）\n- 语音识别：wx.getRecorderManager录音+speechToText云函数（主CloudBase AI，降级微信同声传译插件）\n- 内容审核：微信原生安全API（security.msgSecCheck / security.imgSecCheck / security.mediaCheckAsync）\n- 图片处理：wx.chooseMedia+CloudBase云存储，前端压缩1920px\n- 视频处理：wx.chooseMedia+CloudBase云存储，限制30秒时长\n- 基础库版本：>=3.1.0\n\n## 整体架构\n\n采用微信小程序+CloudBase全栈架构。前端wx.cloud SDK直连云数据库只读操作（安全规则），写操作通过云函数统一处理。图片视频经temp目录审核后移正式目录。所有返回列表的云函数执行三步关联查询：查主数据→批量查users注入头像昵称→批量查userLikes/implLikes注入点赞状态。\n\n## 架构图\n\n```mermaid\ngraph TD\n    subgraph 小程序前端\n        A[今日 today]\n        B[热门 hot]\n        C[推荐 recommend]\n        D[发布 publish]\n        E[详情 detail]\n        M[我的 my]\n        T[标签 tag]\n        W[提交成果 submit-impl]\n    end\n\n    subgraph CloudBase 后端\n        F0[initUserProfile]\n        F1[updateProfile]\n        F2[publishCreativity]\n        F3[editCreativity]\n        F4[deleteCreativity]\n        F5[getTodayList]\n        F6[getHotList]\n        F7[getRecommendList]\n        F8[getCreativitiesByTag]\n        F9[toggleLike]\n        F10[toggleImplLike]\n        F11[speechToText]\n        F12[getCreativityDetail]\n        F13[claimCreativity]\n        F14[cancelClaim]\n        F15[submitImplementation]\n        F16[editImplementation]\n        F17[deleteImplementation]\n        F18[getMyCreativities]\n        F19[getMyImplementations]\n        F20[getMyLikedCreativities]\n        F21[getMyCommentedCreativities]\n        F22[addComment]\n        F23[getComments]\n        F24[deleteComment]\n        L1[(users)]\n        L2[(creativities)]\n        L3[(userLikes)]\n        L4[(claims)]\n        L5[(implementations)]\n        L6[(implLikes)]\n        L7[(comments)]\n        N[云存储 images/voices/videos/temp]\n    end\n\n    A --> F0\n    B --> F0\n    C --> F0\n    M --> F0\n    M --> F1\n    D --> F2\n    D --> F11\n    D --> N\n    A --> F5\n    B --> F6\n    C --> F7\n    T --> F8\n    E --> F12\n    E --> F9\n    E --> F13\n    E --> F14\n    E --> F15\n    E --> F22\n    E --> F23\n    E --> F24\n    W --> F15\n    W --> F16\n    E --> N\n    M --> F18\n    M --> F19\n    M --> F20\n    M --> F21\n    E --> F3\n    E --> F4\n    E --> F16\n    E --> F17\n    F5 --> L1\n    F5 --> L2\n    F5 --> L3\n    F6 --> L1\n    F6 --> L2\n    F6 --> L3\n    F7 --> L1\n    F7 --> L2\n    F7 --> L3\n    F8 --> L1\n    F8 --> L2\n    F8 --> L3\n    F12 --> L1\n    F12 --> L2\n    F12 --> L3\n    F12 --> L5\n    F12 --> L6\n    F12 --> L7\n    F20 --> L3\n    F20 --> L2\n    F20 --> L1\n    F21 --> L7\n    F21 --> L2\n    F21 --> L1\n    F23 --> L7\n    F23 --> L1\n    F18 --> L1\n    F18 --> L2\n    F19 --> L1\n    F19 --> L5\n```\n\n## 数据模型\n\n### 1. users 集合\n\n| 字段 | 类型 | 说明 |\n| --- | --- | --- |\n| _id | String | 自动生成 |\n| _openid | String | 用户唯一标识 |\n| nickName | String | 昵称（默认\"微信用户\"） |\n| avatarUrl | String | 头像URL |\n| createdAt | Date | 注册时间 |\n| updatedAt | Date | 最近更新时间 |\n\n\n### 2. creativities 集合\n\n| 字段 | 类型 | 说明 |\n| --- | --- | --- |\n| _id | String | 自动生成 |\n| _openid | String | 发布者openid |\n| content | String | 文字内容 |\n| voiceUrl | String | 语音文件URL |\n| images | Array[String] | 图片URL数组 |\n| tags | Array[String] | 标签数组 |\n| likeCount | Number | 点赞数（默认0） |\n| dislikeCount | Number | 点踩数（默认0） |\n| claimCount | Number | 认领人数（默认0） |\n| implCount | Number | 实现成果总数（默认0） |\n| commentCount | Number | 评论数（默认0） |\n| createdAt | Date | 发布时间 |\n| date | String | YYYY-MM-DD |\n\n\n### 3. userLikes 集合\n\n| 字段 | 类型 | 说明 |\n| --- | --- | --- |\n| _id | String | 自动生成 |\n| _openid | String | 用户openid |\n| creativityId | String | 关联创意ID |\n| type | String | \"like\"或\"dislike\" |\n| createdAt | Date | 操作时间 |\n\n\n### 4. claims 集合\n\n| 字段 | 类型 | 说明 |\n| --- | --- | --- |\n| _id | String | 自动生成 |\n| _openid | String | 认领者openid |\n| creativityId | String | 关联创意ID |\n| status | String | \"active\" |\n| createdAt | Date | 认领时间 |\n\n\n### 5. implementations 集合\n\n| 字段 | 类型 | 说明 |\n| --- | --- | --- |\n| _id | String | 自动生成 |\n| creativityId | String | 关联创意ID |\n| claimId | String | 关联认领记录ID |\n| _openid | String | 实现者openid |\n| description | String | 实现说明文字 |\n| screenshots | Array[String] | 截图URL数组（最多9张） |\n| videoUrl | String | 视频URL（可选） |\n| videoStatus | String | \"pending_review\"/\"approved\"/\"rejected\" |\n| version | Number | 版本号（从1递增） |\n| likeCount | Number | 成果点赞数（默认0） |\n| createdAt | Date | 提交时间 |\n| updatedAt | Date | 最近更新时间 |\n\n\n### 6. implLikes 集合\n\n| 字段 | 类型 | 说明 |\n| --- | --- | --- |\n| _id | String | 自动生成 |\n| _openid | String | 用户openid |\n| implementationId | String | 关联实现成果ID |\n| createdAt | Date | 操作时间 |\n\n\n### 7. comments 集合\n\n| 字段 | 类型 | 说明 |\n| --- | --- | --- |\n| _id | String | 自动生成 |\n| creativityId | String | 关联创意ID |\n| _openid | String | 评论者openid |\n| content | String | 评论内容 |\n| parentId | String | 父评论ID，null=一级评论，非null=二级回复 |\n| replyTo | String | 被回复用户openid（二级回复时填写） |\n| replyToNickName | String | 被回复用户昵称（冗余字段避免额外查询） |\n| createdAt | Date | 评论时间 |\n\n\n## 安全规则\n\n| 集合 | 读取规则 | 写入规则 |\n| --- | --- | --- |\n| users | 所有用户可读 | 仅云函数可写 |\n| creativities | 所有用户可读 | 仅云函数可写 |\n| userLikes | 仅创建者可读 | 仅云函数可写 |\n| claims | 仅创建者可读 | 仅云函数可写 |\n| implementations | 所有用户可读 | 仅云函数可写 |\n| implLikes | 仅创建者可读 | 仅云函数可写 |\n| comments | 所有用户可读 | 仅云函数可写 |\n\n\n## 数据库索引\n\n```\nusers:          { _openid: 1 }\ncreativities:   { date: 1, createdAt: -1 }    // 今日+近3天fallback\n                { likeCount: -1 }              // 热门排序\n                { _openid: 1, createdAt: -1 }  // 我的发布\n                { tags: 1, createdAt: -1 }     // 标签浏览\nuserLikes:      { _openid: 1, creativityId: 1, type: 1 }  // 去重+状态查询+互动记录\nclaims:         { _openid: 1, creativityId: 1 }            // 去重\n                { creativityId: 1 }                        // 按创意查\nimplementations:{ creativityId: 1, createdAt: -1 }         // 按创意查成果\n                { _openid: 1, createdAt: -1 }              // 我的实现\n                { claimId: 1, version: -1 }                // 按认领查版本\nimplLikes:      { _openid: 1, implementationId: 1 }        // 去重\ncomments:       { creativityId: 1, parentId: 1, createdAt: 1 }  // 一级评论+子回复\n                { _openid: 1, createdAt: -1 }              // 我的评论+互动记录\n```\n\n## 关键实现细节\n\n### 1. 图片审核流程\n\n前端上传图片到临时目录 cloud://temp/xxx → 调用云函数传入temp fileID → 云函数下载为buffer → security.imgSecCheck(buffer) → 通过则move到正式目录cloud://images/xxx → 不通过则delete temp文件+返回错误码\n\n### 2. 文本审核埋点\n\n所有用户输入文本（昵称/创意内容/实现描述/评论内容）在写入数据库前调用security.msgSecCheck(content)，违规则拒绝请求返回特定错误码\n\n### 3. 视频异步审核\n\nsubmitImplementation上传视频后标记videoStatus=\"pending_review\"，调用security.mediaCheckAsync提交审核\n\n### 4. 用户信息+点赞状态关联查询\n\n所有列表类云函数执行三步：查主数据→提取所有_openid批量查users组装头像昵称→提取所有主键ID+当前用户openid批量查点赞表注入isLiked/isDisliked\n\n### 5. 删除创意的级联清除\n\ndeleteCreativity：删除creativities→查询claims→删除implementations+implLikes→删除userLikes→删除comments→删除claims→删除云存储关联文件\n\n### 6. 删除实现成果\n\ndeleteImplementation：删除implementations→删除implLikes→删除关联claim→creativities.claimCount-=1→creativities.implCount-=1→删除云存储关联文件\n\n### 7. 推荐随机算法（降级方案）\n\ncount()获总数→Math.floor(Math.random()*count)生成offset→skip(offset).limit(1)→循环取N条并前端去重\n\n### 8. 今日fallback\n\ngetTodayList先查当日创意，count=0则查近3天（date _.gte()范围），返回附带date标记\n\n### 9. 评论系统（二级嵌套修正）\n\n- addComment：新增 parentId/replyTo/replyToNickName 参数。一级评论(parentId=null)同步 commentCount+=1，二级评论不累计 commentCount。均需 msgSecCheck 审核\n- getComments：先查一级评论(parentId=null)→提取一级ID用 `_.in()` 批量查子回复→关联 users 注入头像昵称→组装嵌套结构返回→分页仅按一级评论分页\n- deleteComment：删除一级评论时级联删除所有子回复，同步 commentCount-=1；删除二级回复仅删自身，不影响计数\n- deleteCreativity 级联删除所有 comments 及子回复，无需额外操作\n\n### 10. 互动记录查询（修正D）\n\ngetMyLikedCreativities：按_openid+type=\"like\"查userLikes→提取所有creativityId→db.command.in()批量查creativities（不存在则过滤掉，不报错）→关联users→分页返回\ngetMyCommentedCreativities：按_openid查comments→提取所有creativityId去重→db.command.in()批量查creativities（不存在则过滤掉）→关联users→分页返回\n\n### 11. 用户初始化优化（修正E）\n\ninitUserProfile在app.js onLaunch中调用一次，通过wx.getStorageSync('hasInit')缓存标记，避免每个页面onLoad重复调用。用户主动编辑资料后清除缓存重新获取。\n\n### 12. 认证鉴权\n\n所有写操作云函数通过cloud.getWXContext().OPENID获取当前用户，编辑/删除操作校验_openid===doc._openid\n\n### 13. 性能优化\n\n- 图片前端压缩至1920px宽度，视频限制30秒\n- 列表图片懒加载lazy-load\n- 实现成果列表分页（每页10条）\n- 低频云函数可合并操作类型参数\n\n采用现代极简 + 活力渐变风格，以紫蓝渐变为主色调，暖橙为交互强调色，白色卡片承载内容。五栏底部Tab导航，卡片式内容流。设计年轻化、轻快活泼，适合创意灵感共创社区。\n\n## 页面设计要点\n\n### 今日页面（Tab1）\n\n- 顶部紫蓝渐变头部，显示日期和\"今日创意\"标题\n- 创意卡片列表：发布者头像+昵称、文字摘要3行、图片缩略图网格、标签胶囊（可点击跳转标签浏览页）、点赞/点踩数+高亮状态、认领人数徽章\n- 空状态插画+\"今天还没有创意，快来发布第一个吧\"；无数据时自动fallback近3天\n- 下拉刷新\n\n### 热门页面（Tab2）\n\n- 火焰图标+\"热门创意\"头部\n- 左侧排名数字（前3金银铜色），右侧创意卡片+热度渐变进度条\n- 触底分页加载\n\n### 推荐页面（Tab3）\n\n- 骰子图标+\"探索创意\"头部\n- 单张大卡片居中展示，轻微浮动阴影，完整内容呈现\n- \"换一批\"按钮+点赞/点踩组，卡片翻转切换动效\n\n### 发布页面（Tab4）\n\n- 大文本域（placeholder:\"分享你的创意灵感...\"）\n- 圆形麦克风按钮（长按录音，红色脉冲动效）\n- 已上传图片九宫格预览（支持删除）\n- 可滚动标签云（选中高亮紫色，多选）\n- 底部固定渐变紫色发布按钮\n\n### 创意详情页\n\n- swiper图片轮播（双击放大预览）\n- 完整文字内容+语音播放条\n- 标签胶囊行（可点击跳转标签页）\n- 发布者头像昵称+发布时间\n- 点赞/点踩按钮组（当前用户状态高亮）\n- 认领按钮区：未认领→\"我要实现\"橙色、已认领无成果→\"取消认领\"、已提交→\"更新实现成果\"紫色\n- 作者可见编辑/删除按钮\n- 实现成果列表区：\"社区实现(N)\"，默认折叠前3个+\"展开全部\"\n- 评论区块：最新3条一级评论+展开全部+底部评论输入框。每条一级评论下展示子回复列表（默认折叠，点击展开），支持回复他人（@昵称）\n\n### 标签浏览页\n\n- 顶部标签名称标题+创意总数\n- 排序切换（最新/最热）\n- 创意卡片列表，分页加载\n\n### 提交实现成果页\n\n- 描述文本域\n- 截图9宫格上传（支持删除）\n- 视频选择按钮+缩略图预览\n- 底部固定渐变绿色提交按钮\n\n### 我的页面（Tab5）\n\n- 紫蓝渐变背景用户信息卡：圆形头像+昵称，点击弹出编辑面板（chooseAvatar+nickname input）\n- 三栏切换：「我发布的」「我实现的」「我的互动」\n- 我发布的：创意卡片列表，含编辑/删除入口\n- 我实现的：创意标题+成果摘要+版本号，含编辑/删除入口\n- 我的互动：两子栏「我点赞的」「我评论的」，展示关联创意卡片列表\n\n## Agent Extensions\n\n### MCP\n\n- **CloudBase MCP**\n- 用途：管理云开发环境完整生命周期——auth登录、数据库7个集合创建+索引配置+安全规则、25个云函数创建部署、云存储bucket权限管理及temp/images/voices/videos目录创建\n- 预期结果：完成CloudBase后端环境搭建，所有集合、索引、安全规则、云函数部署就绪，存储目录结构就绪\n\n### Skill\n\n- **miniprogram-development**\n- 用途：获取微信小程序开发规范、CloudBase集成最佳实践、chooseAvatar/nickname input/security.msgSecCheck/security.imgSecCheck等API用法\n- 预期结果：项目代码符合小程序最新标准，CloudBase SDK集成正确，内容审核API调用规范\n\n- **ui-design**\n- 用途：为8个核心页面（今日/热门/推荐/发布/详情+评论+实现成果/我的(含三栏互动记录)/标签浏览/提交实现成果）和3个通用组件（creativity-card/implementation-card/tag-selector）生成高质量UI设计\n- 预期结果：完整页面视觉设计，布局配色动效细节完善\n\n- **spec-workflow**\n- 用途：按标准软件工程流程进行需求分析、技术设计和任务规划\n- 预期结果：结构化开发计划，多模块有序推进",
+  "design": {
+    "architecture": {
+      "framework": "miniprogram"
+    },
+    "styleKeywords": [
+      "现代极简",
+      "活力渐变",
+      "卡片式布局",
+      "微动效交互",
+      "年轻化创意社区",
+      "共创氛围"
+    ],
+    "fontSystem": {
+      "fontFamily": "PingFang SC",
+      "heading": {
+        "size": "20px",
+        "weight": 600
+      },
+      "subheading": {
+        "size": "16px",
+        "weight": 500
+      },
+      "body": {
+        "size": "14px",
+        "weight": 400
+      }
+    },
+    "colorSystem": {
+      "primary": [
+        "#6C5CE7",
+        "#A29BFE",
+        "#5B4DBC"
+      ],
+      "background": [
+        "#F8F9FE",
+        "#FFFFFF",
+        "#F0F0FF"
+      ],
+      "text": [
+        "#1A1A2E",
+        "#636E72",
+        "#B2BEC3"
+      ],
+      "functional": [
+        "#FF6B6B",
+        "#FFD93D",
+        "#6BCB77",
+        "#4ECDC4"
+      ]
+    }
+  },
+  "todolist": [
+    {
+      "id": "init-cloudbase-env",
+      "content": "使用 [mcp:CloudBase MCP] 登录云开发环境、查询环境信息并绑定目标环境",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "setup-database",
+      "content": "使用 [mcp:CloudBase MCP] 创建 users/creativities/userLikes/claims/implementations/implLikes/comments/notifications/favorites/follows 十个数据库集合，配置安全规则与全部复合索引（含userLikes唯一索引修正、claims.expireAt索引、follows唯一索引等）",
+      "dependencies": [
+        "init-cloudbase-env"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "download-template",
+      "content": "使用 [mcp:CloudBase MCP] downloadTemplate 下载 miniprogram 模板到工作区",
+      "dependencies": [
+        "init-cloudbase-env"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "create-cloud-functions",
+      "content": "使用 [skill:miniprogram-development] 开发全部35个云函数并部署（含onMediaCheckResult HTTP回调、cleanExpiredClaims定时任务、searchCreativities、toggleFavorite、getMyFavorites、getUserProfile、getNotifications、markNotificationRead、toggleFollow、getFollowedCreativities）",
+      "dependencies": [
+        "setup-database"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "build-core-pages",
+      "content": "使用 [skill:ui-design] 设计并开发11个核心页面（含搜索/用户主页/消息中心）和3个通用组件的 WXML/WXSS/JS",
+      "dependencies": [
+        "download-template"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-user-profile",
+      "content": "实现用户系统：initUserProfile自动创建、chooseAvatar+nickname input编辑面板、updateProfile含审核、users关联查询注入所有接口、用户主页getUserProfile",
+      "dependencies": [
+        "build-core-pages",
+        "create-cloud-functions"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-publish-flow",
+      "content": "实现发布流程：文字含审核（400字限制+输入框实时字数计数器）、语音录制+speechToText（主微信同声传译插件降级腾讯云ASR）、图片批量并行审核移正式目录、标签选择、表单提交、草稿保存",
+      "dependencies": [
+        "build-core-pages",
+        "create-cloud-functions"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-interaction",
+      "content": "实现点赞/点踩互斥（事务保护）、创意与成果双维度点赞状态注入、收藏toggleFavorite、四步关联查询注入点赞+收藏状态、交互组件高亮",
+      "dependencies": [
+        "build-core-pages",
+        "create-cloud-functions"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-claim-and-implement",
+      "content": "实现多人认领：claimCreativity含expireAt 7天时效、cancelClaim、submitImplementation含审核、版本原地更新递增、成果折叠前3个、成果点赞状态、cleanExpiredClaims定时清理",
+      "dependencies": [
+        "build-core-pages",
+        "create-cloud-functions"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-video-review-callback",
+      "content": "实现视频审核回调：onMediaCheckResult HTTP触发器云函数接收微信异步审核结果、更新videoStatus、rejected时写入notification通知作者、前端审核中占位符",
+      "dependencies": [
+        "create-cloud-functions"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-edit-delete",
+      "content": "实现编辑删除：创意编辑含审核/删除级联分批清除（含notifications/favorites）事务保护、成果编辑含审核原地更新version递增/删除级联删claim减claimCount、权限校验、云存储异步删除",
+      "dependencies": [
+        "build-core-pages",
+        "create-cloud-functions"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-comments",
+      "content": "实现评论系统：addComment含msgSecCheck+写入通知、getComments分页+关联users、deleteComment权限校验、折叠前3条+展开+底部输入框、二级回复通知被回复者",
+      "dependencies": [
+        "build-core-pages",
+        "create-cloud-functions"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-interaction-records",
+      "content": "实现互动记录：getMyLikedCreativities和getMyCommentedCreativities云函数、我的页面五栏+互动子栏切换、复用creativity-card组件",
+      "dependencies": [
+        "build-core-pages",
+        "create-cloud-functions"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-tag-browse",
+      "content": "实现标签浏览：标签点击跳转、getCreativitiesByTag分页查询、排序切换（最新/最热）、复用creativity-card组件",
+      "dependencies": [
+        "build-core-pages",
+        "create-cloud-functions"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-search",
+      "content": "实现搜索功能：searchCreativities云函数（正则匹配/全文搜索）、搜索页搜索历史+热门搜索、搜索结果分页+复用creativity-card组件",
+      "dependencies": [
+        "build-core-pages",
+        "create-cloud-functions"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-favorites",
+      "content": "实现收藏功能：toggleFavorite云函数、favorites唯一索引去重、creativities.favoriteCount计数、我的收藏页getMyFavorites分页",
+      "dependencies": [
+        "build-core-pages",
+        "create-cloud-functions"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-notifications",
+      "content": "实现通知系统：notifications集合、getNotifications分页+markNotificationRead、评论/认领/审核结果触发通知写入、我的页消息入口红点、消息中心页",
+      "dependencies": [
+        "build-core-pages",
+        "create-cloud-functions"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-sharing",
+      "content": "实现社交分享：所有内容页配置onShareAppMessage和onShareTimeline、分享卡片携带创意摘要和缩略图、path参数传递",
+      "dependencies": [
+        "build-core-pages"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-today-and-recommend",
+      "content": "实现今日列表分页+动态fallback（不足10条补充近7天→近30天）、推荐页$sample聚合管道+纵向卡片列表布局",
+      "dependencies": [
+        "build-core-pages",
+        "create-cloud-functions"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "implement-follow",
+      "content": "实现关注用户：toggleFollow云函数、follows唯一索引去重、getUserProfile返回isFollowing状态、用户主页关注按钮、getFollowedCreativities返回关注用户创意流、我的页面我关注的入口、发布创意时通知关注者",
+      "dependencies": [
+        "build-core-pages",
+        "create-cloud-functions"
+      ],
+      "status": "pending"
+    }
+  ]
+}

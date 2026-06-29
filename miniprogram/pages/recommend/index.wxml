@@ -1,0 +1,65 @@
+<!-- pages/recommend/index.wxml -->
+<view class="page">
+  <view class="header">
+    <view class="header-title"><text>🎲</text> 探索创意</view>
+    <view class="header-sub">随机发现有趣的灵感</view>
+  </view>
+
+  <scroll-view scroll-y class="content">
+    <block wx:if="{{list.length > 0}}">
+      <view
+        class="card-container"
+        wx:for="{{list}}"
+        wx:key="_id"
+        bindtap="onCardClick"
+        data-id="{{item._id}}"
+      >
+        <view class="big-card">
+          <view class="big-author" wx:if="{{item.author}}">
+            <image class="big-avatar" src="{{item.author.avatarUrl}}" mode="aspectFill"></image>
+            <text class="big-nickname">{{item.author.nickName}}</text>
+            <text class="big-nickname">{{item.date}}</text>
+          </view>
+          <view class="big-content">{{item.content}}</view>
+          <image
+            wx:if="{{item.images[0]}}"
+            class="big-image"
+            src="{{item.images[0]}}"
+            mode="aspectFill"
+            lazy-load
+          ></image>
+          <view class="big-tags">
+            <view class="big-tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</view>
+          </view>
+        </view>
+        <view class="action-bar">
+          <view class="action-group">
+            <view
+              class="action-btn {{item.isLiked ? 'active' : ''}}"
+              catchtap="onLike"
+              data-id="{{item._id}}"
+            >♡ {{item.likeCount}}</view>
+            <view
+              class="action-btn {{item.isDisliked ? 'dislike' : ''}}"
+              catchtap="onDislike"
+              data-id="{{item._id}}"
+            >✗ {{item.dislikeCount}}</view>
+          </view>
+          <view style="font-size: 24rpx; color: #b2bec3;">认领 {{item.claimCount}}</view>
+        </view>
+      </view>
+      <button class="refresh-btn" bindtap="onRefresh" loading="{{loading}}">🔄 换一批</button>
+    </block>
+
+    <view class="loading-wrap" wx:if="{{loading && list.length === 0}}">
+      <text>加载中...</text>
+    </view>
+
+    <empty-state
+      wx:if="{{list.length === 0 && !loading}}"
+      icon="🎲"
+      text="暂无推荐"
+      sub-text="点击下方按钮换一批"
+    ></empty-state>
+  </scroll-view>
+</view>
