@@ -1,0 +1,228 @@
+/* pages/profile/profile.wxss */
+
+/* 页面容器 */
+.page {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--color-bg-page);
+}
+
+/* ============================================
+   顶部渐变背景区
+   ============================================ */
+
+.header {
+  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-bg-page) 100%);
+  padding: 0 32rpx 48rpx;   /* 0 16px 24px */
+  position: relative;
+}
+
+/* 编辑按钮 */
+.edit-btn {
+  position: absolute;
+  top: 180rpx;      /* 90px (状态栏 + 导航栏 + 额外间距) */
+  right: 32rpx;
+  width: 72rpx;       /* 36px */
+  height: 72rpx;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-btn__icon {
+  font-size: 32rpx;
+}
+
+/* ============================================
+   用户信息
+   ============================================ */
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 48rpx;    /* 24px */
+  padding-top: 120rpx;      /* 60px (为编辑按钮留出空间) */
+}
+
+.user-info__avatar {
+  width: 176rpx;     /* 88px */
+  height: 176rpx;
+  border-radius: var(--radius-full);
+  border: 6rpx solid #FFFFFF;
+  margin-right: 32rpx;   /* 16px */
+  flex-shrink: 0;
+  background: var(--color-bg-input);
+}
+
+.user-info__avatar--default {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80rpx;
+  background: var(--color-bg-input);
+}
+
+.user-info__detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-info__name {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: #FFFFFF;
+  margin-bottom: var(--spacing-xs);
+}
+
+.user-info__id {
+  font-size: var(--font-size-base);
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: var(--spacing-xs);
+}
+
+.user-info__bio {
+  font-size: var(--font-size-md);
+  color: rgba(255, 255, 255, 0.9);
+  line-height: var(--line-height-normal);
+}
+
+/* ============================================
+   数据卡片
+   ============================================ */
+
+.stats-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg) 0;
+  margin-bottom: var(--spacing-lg);
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+.stats-card__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.stats-card__value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.stats-card__label {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}
+
+.stats-card__divider {
+  width: 2rpx;
+  height: 64rpx;      /* 32px */
+  background: var(--color-border-light);
+}
+
+/* ============================================
+   内容 Tab
+   ============================================ */
+
+.content-tabs {
+  display: flex;
+  align-items: center;
+  height: 88rpx;      /* 44px */
+  background: var(--color-bg-card);
+  border-bottom: 2rpx solid var(--color-border-light);
+}
+
+.content-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  position: relative;
+}
+
+.content-tab__text {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.content-tab--active .content-tab__text {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.content-tab__indicator {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48rpx;      /* 24px */
+  height: 6rpx;       /* 3px */
+  background: var(--color-primary);
+  border-radius: 3rpx;
+}
+
+/* ============================================
+   内容列表
+   ============================================ */
+
+.content-list {
+  height: calc(100vh - 700rpx);   /* 减去头部和高度 */
+  padding: var(--spacing-lg);
+  box-sizing: border-box;
+}
+
+/* ============================================
+   常用功能
+   ============================================ */
+
+.functions {
+  padding: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.functions__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.functions__list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+}
+
+.functions__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md) 0;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-md);
+}
+
+.functions__item-icon {
+  font-size: 48rpx;    /* 24px */
+  margin-bottom: var(--spacing-xs);
+}
+
+.functions__item-text {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}

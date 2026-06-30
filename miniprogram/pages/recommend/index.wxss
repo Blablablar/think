@@ -25,9 +25,15 @@
 }
 
 .content {
-  padding: 0 32rpx 120rpx;
+  padding: 0 32rpx 180rpx;
   height: calc(100vh - 220rpx);
   box-sizing: border-box;
+}
+
+.content::after {
+  content: '';
+  display: block;
+  height: env(safe-area-inset-bottom);
 }
 
 .card-container {

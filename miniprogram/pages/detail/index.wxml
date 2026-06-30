@@ -1,238 +1,164 @@
 <!-- pages/detail/index.wxml -->
 <view class="page">
+  <!-- 自定义导航栏 -->
+  <navbar
+    type="white"
+    title="创意详情"
+    show-back="{{true}}"
+    right-text="···"
+    bind:rightClick="onMoreClick"
+  ></navbar>
+
   <block wx:if="{{loading && !detail}}">
     <view class="loading-tip">加载中...</view>
   </block>
 
   <block wx:elif="{{detail}}">
-    <scroll-view scroll-y class="scroll-area" enable-back-to-top>
+    <scroll-view scroll-y class="scroll-area" enhanced show-scrollbar="{{false}}">
       <!-- 作者信息 -->
-      <view class="author-card" bindtap="onAuthorClick">
-        <image wx:if="{{author.avatarUrl}}" class="avatar" src="{{author.avatarUrl}}" mode="aspectFill"></image>
-        <view wx:else class="avatar avatar-default">👤</view>
-        <view class="author-info">
-          <view class="author-name ellipsis">{{author.nickName || '微信用户'}}</view>
-          <view class="author-time">{{detail.date}}</view>
+      <view class="author-section">
+        <view class="author-info" bindtap="onAuthorClick">
+          <image class="author-avatar" src="{{detail.author.avatar}}" mode="aspectFill"></image>
+          <view class="author-meta">
+            <text class="author-name">{{detail.author.name}}</text>
+            <text class="author-time">{{detail.timeLabel}}</text>
+          </view>
         </view>
-        <view class="claim-badge">
-          <text class="claim-icon">🎯</text>
-          <text>{{claimCount}}人认领</text>
-        </view>
-      </view>
-
-      <!-- 创意内容 -->
-      <view class="content-card">
-        <view class="content-text">{{detail.content}}</view>
-
-        <!-- 图片轮播 -->
-        <swiper
-          wx:if="{{detail.images.length > 0}}"
-          class="image-swiper"
-          indicator-dots="{{detail.images.length > 1}}"
-          indicator-color="rgba(108, 92, 231, 0.3)"
-          indicator-active-color="#6c5ce7"
-          autoplay="{{false}}"
-          circular="{{detail.images.length > 1}}"
-          bindchange="onSwiperChange"
+        <view
+          class="follow-btn {{detail.author.isFollowing ? 'follow-btn--active' : ''}}"
+          bindtap="onFollowClick"
         >
-          <swiper-item wx:for="{{detail.images}}" wx:key="*this">
-            <image
-              class="swiper-image"
-              src="{{item}}"
-              mode="aspectFill"
-              bindtap="onPreviewImage"
-              data-index="{{index}}"
-            ></image>
-          </swiper-item>
-        </swiper>
-
-        <!-- 标签 -->
-        <view class="tags" wx:if="{{detail.tags.length > 0}}">
-          <view
-            class="tag"
-            wx:for="{{detail.tags}}"
-            wx:key="*this"
-            catchtap="onTagClick"
-            data-tag="{{item}}"
-          >{{item}}</view>
+          {{detail.author.isFollowing ? '已关注' : '+ 关注'}}
         </view>
       </view>
 
-      <!-- 互动按钮区 -->
-      <view class="action-card">
-        <view class="action-btn {{isLiked ? 'active-like' : ''}}" bindtap="onLike">
-          <text class="action-icon">{{isLiked ? '❤️' : '🤍'}}</text>
-          <text class="action-num">{{likeCount}}</text>
+      <!-- 推荐理由标签 -->
+      <view class="recommend-tag" wx:if="{{detail.recommendReason}}">
+        <text>{{detail.recommendReason}}</text>
+      </view>
+
+      <!-- 标题 -->
+      <view class="detail-title" wx:if="{{detail.title}}">{{detail.title}}</view>
+
+      <!-- 正文内容 -->
+      <view class="detail-content">{{detail.content}}</view>
+
+      <!-- 图片展示 -->
+      <view class="detail-images" wx:if="{{detail.images.length > 0}}">
+        <!-- 单图 -->
+        <image
+          wx:if="{{detail.images.length === 1}}"
+          class="detail-image-single"
+          src="{{detail.images[0]}}"
+          mode="widthFix"
+          bindtap="onPreviewImage"
+          data-index="0"
+        ></image>
+
+        <!-- 多图横滑 -->
+        <scroll-view
+          wx:else
+          scroll-x
+          class="detail-images-scroll"
+          enhanced
+          show-scrollbar="{{false}}"
+        >
+          <image
+            wx:for="{{detail.images}}"
+            wx:key="index"
+            class="detail-image-item"
+            src="{{item}}"
+            mode="aspectFill"
+            bindtap="onPreviewImage"
+            data-index="{{index}}"
+          ></image>
+        </scroll-view>
+      </view>
+
+      <!-- 底部互动区 -->
+      <view class="interaction-bar">
+        <view class="interaction-btn {{isLiked ? 'interaction-btn--active' : ''}}" bindtap="onLike">
+          <text class="interaction-icon">{{isLiked ? '❤️' : '🤍'}}</text>
+          <text class="interaction-count">{{likeCount}}</text>
         </view>
-        <view class="action-btn {{isDisliked ? 'active-dislike' : ''}}" bindtap="onDislike">
-          <text class="action-icon">{{isDisliked ? '✗' : '✗'}}</text>
-          <text class="action-num">{{dislikeCount}}</text>
+        <view class="interaction-btn" bindtap="onScrollToComment">
+          <text class="interaction-icon">💬</text>
+          <text class="interaction-count">{{commentCount}}</text>
         </view>
-        <view class="action-btn {{isFavorited ? 'active-fav' : ''}}" bindtap="onFavorite">
-          <text class="action-icon">{{isFavorited ? '★' : '☆'}}</text>
-          <text class="action-num">{{favoriteCount}}</text>
-        </view>
-        <view class="action-btn">
-          <text class="action-icon">💬</text>
-          <text class="action-num">{{commentCount}}</text>
+        <view class="interaction-btn" bindtap="onShare">
+          <text class="interaction-icon">↗️</text>
         </view>
       </view>
 
-      <!-- 认领操作区 -->
-      <view class="claim-card">
-        <block wx:if="{{!myClaim}}">
-          <button class="claim-btn primary" bindtap="onClaim">我要实现</button>
-        </block>
-        <block wx:else>
-          <button class="claim-btn primary" bindtap="onSubmitImpl">提交/更新实现成果</button>
-          <button class="claim-btn ghost" bindtap="onCancelClaim">取消认领</button>
-        </block>
-      </view>
-
-      <!-- 实现成果列表 -->
-      <view class="section-card" wx:if="{{implList.length > 0}}">
-        <view class="section-header">
-          <text class="section-title">实现成果 {{implTotal}}</text>
-          <text class="section-toggle" wx:if="{{implList.length > 3}}" bindtap="onToggleImpl">
-            {{implExpanded ? '收起' : '展开全部'}}
-          </text>
+      <!-- 评论区 -->
+      <view class="comment-section" id="comment-section">
+        <view class="comment-header">
+          <text class="comment-title">评论 {{commentCount}}</text>
         </view>
-        <view class="impl-list">
-          <block wx:for="{{implList}}" wx:key="_id" wx:for-index="pidx">
-            <view wx:if="{{implExpanded || index < 3}}" class="impl-item">
-              <view class="impl-item-header">
-                <image wx:if="{{item.author.avatarUrl}}" class="impl-avatar" src="{{item.author.avatarUrl}}" mode="aspectFill"></image>
-                <view wx:else class="impl-avatar avatar-default">👤</view>
-                <text class="impl-author ellipsis">{{item.author.nickName || '微信用户'}}</text>
-                <text class="impl-version">v{{item.version}}</text>
-                <text class="impl-date">{{item.date}}</text>
+
+        <view class="comment-list" wx:if="{{comments.length > 0}}">
+          <view class="comment-item" wx:for="{{comments}}" wx:key="id">
+            <image class="comment-avatar" src="{{item.author.avatar}}" mode="aspectFill"></image>
+            <view class="comment-body">
+              <view class="comment-meta">
+                <text class="comment-name">{{item.author.name}}</text>
+                <text class="comment-badge" wx:if="{{item.author.isAuthor}}">作者</text>
+                <text class="comment-time">{{item.timeLabel}}</text>
               </view>
-              <view class="impl-desc">{{item.description}}</view>
-              <view class="impl-images" wx:if="{{item.screenshots.length > 0}}">
-                <image
-                  wx:for="{{item.screenshots}}"
-                  wx:for-item="img"
-                  wx:for-index="idx"
-                  wx:key="*this"
-                  class="impl-image"
-                  src="{{img}}"
-                  mode="aspectFill"
-                  catchtap="onPreviewImplImage"
-                  data-pidx="{{pidx}}"
-                  data-idx="{{idx}}"
-                ></image>
+              <view class="comment-text">{{item.content}}</view>
+              <view class="comment-actions">
+                <text class="comment-action" bindtap="onReplyComment" data-id="{{item.id}}" data-name="{{item.author.name}}">回复</text>
               </view>
-              <video
-                wx:if="{{item.videoUrl}}"
-                class="impl-video"
-                src="{{item.videoUrl}}"
-                controls
-                object-fit="cover"
-              ></video>
-            </view>
-          </block>
-        </view>
-      </view>
 
-      <!-- 评论列表 -->
-      <view class="section-card">
-        <view class="section-header">
-          <text class="section-title">评论 {{commentTotal}}</text>
-          <text class="section-toggle" wx:if="{{commentList.length > 3 && commentHasMore === false}}" bindtap="onToggleComments">
-            {{commentExpanded ? '收起' : '展开全部'}}
-          </text>
-        </view>
-
-        <block wx:if="{{commentList.length > 0}}">
-          <view class="comment-list">
-            <block wx:for="{{commentList}}" wx:key="_id" wx:for-index="pidx">
-              <view wx:if="{{commentExpanded || index < 3}}" class="comment-item">
-                <image wx:if="{{item.author.avatarUrl}}" class="comment-avatar" src="{{item.author.avatarUrl}}" mode="aspectFill"></image>
-                <view wx:else class="comment-avatar avatar-default">👤</view>
-                <view class="comment-body">
-                  <view class="comment-meta">
-                    <text class="comment-name ellipsis">{{item.author.nickName || '微信用户'}}</text>
-                    <text class="comment-time">{{item.date}}</text>
-                  </view>
-                  <view class="comment-text">{{item.content}}</view>
-                  <view class="comment-ops">
-                    <text
-                      class="comment-op"
-                      catchtap="onReplyComment"
-                      data-id="{{item._id}}"
-                      data-nickname="{{item.author.nickName || '微信用户'}}"
-                      data-parentid="{{item._id}}"
-                    >回复</text>
-                    <text
-                      wx:if="{{item.isMine}}"
-                      class="comment-op danger"
-                      catchtap="onDeleteComment"
-                      data-id="{{item._id}}"
-                    >删除</text>
-                  </view>
-
-                  <!-- 二级回复 -->
-                  <view class="reply-list" wx:if="{{item.replies.length > 0}}">
-                    <view class="reply-item" wx:for="{{item.replies}}" wx:for-item="reply" wx:key="_id">
-                      <image wx:if="{{reply.author.avatarUrl}}" class="reply-avatar" src="{{reply.author.avatarUrl}}" mode="aspectFill"></image>
-                      <view wx:else class="reply-avatar avatar-default">👤</view>
-                      <view class="reply-body">
-                        <view class="comment-meta">
-                          <text class="comment-name ellipsis">{{reply.author.nickName || '微信用户'}}</text>
-                          <text class="comment-time">{{reply.date}}</text>
-                        </view>
-                        <view class="comment-text">{{reply.content}}</view>
-                        <view class="comment-ops">
-                          <text
-                            class="comment-op"
-                            catchtap="onReplyComment"
-                            data-id="{{reply._id}}"
-                            data-nickname="{{reply.author.nickName || '微信用户'}}"
-                            data-parentid="{{item._id}}"
-                          >回复</text>
-                          <text
-                            wx:if="{{reply.isMine}}"
-                            class="comment-op danger"
-                            catchtap="onDeleteComment"
-                            data-id="{{reply._id}}"
-                          >删除</text>
-                        </view>
-                      </view>
+              <!-- 多轮回复 -->
+              <view class="reply-list" wx:if="{{item.replies && item.replies.length > 0}}">
+                <view class="reply-item" wx:for="{{item.replies}}" wx:key="id" wx:for-item="reply">
+                  <image class="reply-avatar" src="{{reply.author.avatar}}" mode="aspectFill"></image>
+                  <view class="reply-body">
+                    <view class="reply-meta">
+                      <text class="reply-name">{{reply.author.name}}</text>
+                      <text class="reply-badge" wx:if="{{reply.author.isAuthor}}">作者</text>
                     </view>
+                    <view class="reply-text">{{reply.content}}</view>
                   </view>
                 </view>
+
+                <view class="reply-expand" wx:if="{{item.replies.length > 2 && !item.repliesExpanded}}" bindtap="onExpandReplies" data-id="{{item.id}}">
+                  展开更多回复 ({{item.replies.length - 2}})
+                </view>
               </view>
-            </block>
+            </view>
           </view>
-          <view class="load-more" wx:if="{{commentHasMore}}" bindtap="onLoadMoreComments">加载更多评论</view>
-        </block>
-        <empty-state wx:else icon="💬" text="还没有评论，快来抢沙发"></empty-state>
+        </view>
+
+        <view class="empty-comments" wx:else>
+          <text>暂无评论，快来抢沙发</text>
+        </view>
       </view>
 
       <view class="bottom-spacer"></view>
     </scroll-view>
 
-    <!-- 底部评论输入 -->
+    <!-- 底部评论输入栏 -->
     <view class="comment-bar">
       <view class="reply-tip" wx:if="{{replyTo}}">
-        <text class="reply-tip-text">回复 {{replyTo.nickname}}：</text>
-        <text class="reply-tip-cancel" bindtap="onCancelReply">✕</text>
+        <text>回复 {{replyTo.name}}</text>
+        <text class="reply-cancel" bindtap="onCancelReply">✕</text>
       </view>
       <view class="comment-input-wrap">
         <input
           class="comment-input"
-          placeholder="{{replyTo ? '回复 ' + replyTo.nickname : '写下你的评论...'}}"
+          placeholder="{{replyTo ? '回复 ' + replyTo.name : '说点什么吧...'}}"
           value="{{commentText}}"
           bindinput="onCommentInput"
           confirm-type="send"
           bindconfirm="onSendComment"
         />
         <button
-          class="send-btn {{commentText ? 'active' : ''}}"
+          class="comment-send-btn"
           bindtap="onSendComment"
-          loading="{{sendingComment}}"
-          disabled="{{!commentText || sendingComment}}"
-        >发送</button>
+          disabled="{{!commentText}}"
+        >发布</button>
       </view>
     </view>
   </block>

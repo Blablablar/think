@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "navbar": "/components/navbar/index",
+    "creativity-card": "/components/creativity-card/index",
+    "empty-state": "/components/empty-state/index"
+  }
+}

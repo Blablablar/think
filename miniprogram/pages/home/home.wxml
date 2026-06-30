@@ -1,0 +1,97 @@
+<!-- pages/home/home.wxml -->
+<view class="page">
+  <!-- 自定义导航栏（带搜索框） -->
+  <navbar
+    type="purple"
+    showSearch="{{true}}"
+    searchPlaceholder="搜索灵感..."
+  ></navbar>
+
+  <!-- 页面内容 -->
+  <scroll-view
+    scroll-y
+    class="content"
+    bindscrolltolower="onReachBottom"
+    refresher-enabled
+    refresher-triggered="{{refreshing}}"
+    bindrefresherrefresh="onPullDownRefresh"
+  >
+    <!-- Banner 轮播 -->
+    <view class="banner-section">
+      <swiper
+        class="banner-swiper"
+        autoplay
+        circular
+        interval="3500"
+        indicator-dots
+        indicator-color="rgba(255, 255, 255, 0.5)"
+        indicator-active-color="#FFFFFF"
+      >
+        <swiper-item wx:for="{{banners}}" wx:key="id">
+          <view class="banner-item" style="background: {{item.gradient}};">
+            <view class="banner-tag">{{item.tag}}</view>
+            <view class="banner-title">{{item.title}}</view>
+            <view class="banner-meta">{{item.meta}}</view>
+          </view>
+        </swiper-item>
+      </swiper>
+    </view>
+
+    <!-- 探索分类 8宫格 -->
+    <view class="category-section">
+      <view class="category-grid">
+        <view
+          class="category-item"
+          wx:for="{{categories}}"
+          wx:key="id"
+          bindtap="onCategoryClick"
+          data-id="{{item.id}}"
+        >
+          <view class="category-icon">{{item.icon}}</view>
+          <view class="category-name">{{item.name}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 热门话题 Chip列表 -->
+    <view class="topics-section">
+      <scroll-view scroll-x class="topics-scroll">
+        <view class="topics-list">
+          <view
+            class="topic-chip {{index === 0 ? 'topic-chip--active' : ''}}"
+            wx:for="{{topics}}"
+            wx:key="id"
+            bindtap="onTopicClick"
+            data-id="{{item.id}}"
+          >
+            <text class="topic-chip__icon">🔥</text>
+            <text class="topic-chip__text">{{item.name}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 推荐创意 Feed流 -->
+    <view class="feed-section">
+      <block wx:if="{{list.length > 0}}">
+        <creativity-card
+          wx:for="{{list}}"
+          wx:key="_id"
+          data="{{item}}"
+          bind:click="onCardClick"
+          bind:like="onLike"
+          bind:favorite="onFavorite"
+        ></creativity-card>
+        <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
+        <view class="loading-tip" wx:if="{{!hasMore && list.length > 0}}">没有更多了</view>
+      </block>
+
+      <empty-state
+        wx:if="{{list.length === 0 && !loading}}"
+        icon="💡"
+        text="暂无推荐内容"
+        sub-text="快来发布第一个吧"
+      ></empty-state>
+    </view>
+  </scroll-view>
+</view>

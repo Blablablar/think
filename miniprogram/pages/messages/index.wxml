@@ -1,43 +1,157 @@
 <!-- pages/messages/index.wxml -->
 <view class="page">
-  <view class="header">
-    <text class="header-title">消息通知</text>
-    <text class="mark-all" bindtap="onMarkAllRead">全部已读</text>
+  <!-- 自定义导航栏 -->
+  <navbar
+    type="white"
+    title="消息"
+  ></navbar>
+
+  <!-- 双Tab切换 -->
+  <view class="tab-bar">
+    <view
+      class="tab-item {{activeTab === 'interaction' ? 'tab-item--active' : ''}}"
+      bindtap="onTabChange"
+      data-tab="interaction"
+    >
+      <text>互动</text>
+      <view class="tab-badge" wx:if="{{interactionUnread > 0}}"></view>
+    </view>
+    <view
+      class="tab-item {{activeTab === 'system' ? 'tab-item--active' : ''}}"
+      bindtap="onTabChange"
+      data-tab="system"
+    >
+      <text>系统</text>
+      <view class="tab-badge" wx:if="{{systemUnread > 0}}"></view>
+    </view>
   </view>
 
   <scroll-view
     scroll-y
-    class="list"
+    class="content"
     bindscrolltolower="onReachBottom"
     refresher-enabled
     refresher-triggered="{{refreshing}}"
     bindrefresherrefresh="onPullDownRefresh"
   >
-    <block wx:if="{{list.length > 0}}">
-      <view
-        class="msg-item {{item.isRead ? '' : 'unread'}}"
-        wx:for="{{list}}"
-        wx:key="_id"
-        bindtap="onItemClick"
-        data-id="{{item._id}}"
-        data-creativityid="{{item.creativityId}}"
-        data-type="{{item.type}}"
-      >
-        <view class="msg-icon">{{item.icon}}</view>
-        <view class="msg-body">
-          <view class="msg-text">{{item.text}}</view>
-          <view class="msg-time">{{item.date}}</view>
+    <!-- 互动消息 -->
+    <block wx:if="{{activeTab === 'interaction'}}">
+      <block wx:for="{{groupedMessages}}" wx:key="time" wx:for-item="group">
+        <view class="time-group">{{group.timeLabel}}</view>
+        <view
+          class="msg-item {{item.read ? '' : 'msg-item--unread'}}"
+          wx:for="{{group.messages}}"
+          wx:key="id"
+          bindtap="onMsgClick"
+          data-id="{{item.id}}"
+          data-type="{{item.type}}"
+        >
+          <!-- 未读蓝点 -->
+          <view class="unread-dot" wx:if="{{!item.read}}"></view>
+
+          <!-- 评论消息 -->
+          <block wx:if="{{item.type === 'comment'}}">
+            <image class="msg-avatar" src="{{item.user.avatar}}" mode="aspectFill"></image>
+            <view class="msg-body">
+              <view class="msg-title">
+                <text class="msg-name">{{item.user.name}}</text>
+                <text class="msg-action">评论了你的创意</text>
+              </view>
+              <view class="msg-preview" wx:if="{{item.preview}}">{{item.preview}}</view>
+              <view class="msg-time">{{item.timeLabel}}</view>
+            </view>
+          </block>
+
+          <!-- 多人点赞 -->
+          <block wx:elif="{{item.type === 'like_batch'}}">
+            <view class="msg-avatars">
+              <image class="msg-avatar-small" wx:for="{{item.users}}" wx:key="name" wx:for-item="user" src="{{user.avatar}}" mode="aspectFill"></image>
+            </view>
+            <view class="msg-body">
+              <view class="msg-title">
+                <text>{{item.title}}</text>
+              </view>
+              <view class="msg-time">{{item.timeLabel}}</view>
+            </view>
+          </block>
+
+          <!-- 认领通过 -->
+          <block wx:elif="{{item.type === 'claim_approved'}}">
+            <image class="msg-avatar" src="{{item.user.avatar}}" mode="aspectFill"></image>
+            <view class="msg-body">
+              <view class="msg-title">
+                <text class="msg-name">{{item.user.name}}</text>
+                <text class="msg-action">你的认领已通过</text>
+              </view>
+              <view class="msg-badge">已通过</view>
+              <view class="msg-time">{{item.timeLabel}}</view>
+            </view>
+          </block>
+
+          <!-- 关注消息 -->
+          <block wx:elif="{{item.type === 'follow'}}">
+            <image class="msg-avatar" src="{{item.user.avatar}}" mode="aspectFill"></image>
+            <view class="msg-body">
+              <view class="msg-title">
+                <text class="msg-name">{{item.user.name}}</text>
+                <text class="msg-action">关注了你</text>
+              </view>
+              <view class="msg-time">{{item.timeLabel}}</view>
+            </view>
+          </block>
+
+          <!-- 回复消息 -->
+          <block wx:elif="{{item.type === 'reply'}}">
+            <image class="msg-avatar" src="{{item.user.avatar}}" mode="aspectFill"></image>
+            <view class="msg-body">
+              <view class="msg-title">
+                <text class="msg-name">{{item.user.name}}</text>
+                <text class="msg-action">回复了你的评论</text>
+              </view>
+              <view class="msg-preview" wx:if="{{item.preview}}">{{item.preview}}</view>
+              <view class="msg-time">{{item.timeLabel}}</view>
+            </view>
+          </block>
         </view>
-        <view class="dot" wx:if="{{!item.isRead}}"></view>
+      </block>
+
+      <view class="empty-state" wx:if="{{interactionMessages.length === 0 && !loading}}">
+        <view class="empty-icon">💬</view>
+        <view class="empty-text">暂无互动消息</view>
       </view>
-      <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
-      <view class="loading-tip" wx:if="{{!hasMore && list.length > 0}}">没有更多了</view>
     </block>
 
-    <empty-state
-      wx:if="{{list.length === 0 && !loading}}"
-      icon="🔔"
-      text="暂无消息通知"
-    ></empty-state>
+    <!-- 系统消息 -->
+    <block wx:if="{{activeTab === 'system'}}">
+      <block wx:for="{{groupedSystemMessages}}" wx:key="time" wx:for-item="group">
+        <view class="time-group">{{group.timeLabel}}</view>
+        <view
+          class="msg-item msg-item--system {{item.read ? '' : 'msg-item--unread'}}"
+          wx:for="{{group.messages}}"
+          wx:key="id"
+          bindtap="onMsgClick"
+          data-id="{{item.id}}"
+          data-type="{{item.type}}"
+        >
+          <!-- 未读蓝点 -->
+          <view class="unread-dot" wx:if="{{!item.read}}"></view>
+
+          <view class="system-icon">🔔</view>
+          <view class="msg-body">
+            <view class="msg-title">{{item.title}}</view>
+            <view class="msg-desc" wx:if="{{item.desc}}">{{item.desc}}</view>
+            <view class="msg-time">{{item.timeLabel}}</view>
+          </view>
+        </view>
+      </block>
+
+      <view class="empty-state" wx:if="{{systemMessages.length === 0 && !loading}}">
+        <view class="empty-icon">🔔</view>
+        <view class="empty-text">暂无系统消息</view>
+      </view>
+    </block>
+
+    <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
+    <view class="loading-tip" wx:if="{{!hasMore && totalMessages > 0}}">没有更多了</view>
   </scroll-view>
 </view>

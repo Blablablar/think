@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0">
+<title>灵感岛 · 个人中心</title>
+<link rel="stylesheet" href="design-system.css">
+<style>
+/* ── Profile Header ── */
+.profile-header {
+  position: relative;
+  background: linear-gradient(180deg, var(--brand-purple-500) 0%, var(--brand-purple-600) 100%);
+  padding: var(--space-6) var(--space-4) var(--space-12);
+  text-align: center;
+  color: var(--text-on-brand);
+}
+.profile-header__avatar { display: inline-block; margin-bottom: var(--space-3); }
+.profile-header__name {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  margin-bottom: var(--space-1);
+}
+.profile-header__bio {
+  font-size: var(--text-sm); opacity: 0.75;
+  margin-bottom: 0;
+}
+.profile-edit-btn {
+  position: absolute;
+  top: 8px; right: 12px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.18);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-family: var(--font-stack);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all var(--duration-fast) var(--ease-out-quart);
+}
+.profile-edit-btn:active {
+  transform: scale(0.92);
+  background: rgba(255,255,255,0.3);
+}
+
+/* ── Stat Card (浮层) ── */
+.profile-stats {
+  margin: -24px var(--space-4) 0;
+  position: relative; z-index: 2;
+}
+
+/* ── Content Tabs ── */
+.profile-tabs {
+  display: flex;
+  margin: var(--space-4) var(--space-4) 0;
+  background: var(--white);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.profile-tab {
+  flex: 1; text-align: center;
+  padding: var(--space-3) 0;
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--text-tertiary);
+  cursor: pointer; position: relative;
+}
+.profile-tab--active {
+  color: var(--brand-purple-500);
+  font-weight: var(--weight-semibold);
+}
+.profile-tab--active::after {
+  content: ''; position: absolute; bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 24px; height: 3px; border-radius: 2px;
+  background: var(--brand-purple-500);
+}
+
+/* ── Content List ── */
+.content-list {
+  margin: 0 var(--space-4);
+  background: var(--white);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  overflow: hidden;
+}
+.content-item {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 0.5px solid var(--border-divider);
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+.content-item:last-child { border-bottom: none; }
+.content-item:active { background: var(--bg-hairline); }
+.content-item__thumb {
+  width: 52px; height: 52px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.content-item__info { flex: 1; min-width: 0; }
+.content-item__title {
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.content-item__meta {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  margin-top: 3px;
+  display: flex; align-items: center; gap: var(--space-2);
+}
+.content-item__stats {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  display: flex; align-items: center; gap: 3px;
+}
+
+/* ── Section Heading ── */
+.section-heading {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-6) var(--space-4) var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Menu ── */
+.profile-menu {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  margin: 0 var(--space-4);
+  overflow: hidden;
+}
+.menu-item {
+  display: flex; align-items: center; gap: var(--space-3);
+  height: 48px;
+  padding: 0 var(--space-4);
+  cursor: pointer;
+  transition: background var(--duration-fast);
+  border-bottom: 0.5px solid var(--border-divider);
+}
+.menu-item:last-child { border-bottom: none; }
+.menu-item:active { background: var(--bg-hairline); }
+.menu-item__icon-wrap {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.menu-item__label { flex: 1; font-size: var(--text-base); color: var(--text-primary); }
+.menu-item__extra {
+  font-size: var(--text-sm); color: var(--text-tertiary);
+  display: flex; align-items: center; gap: var(--space-1);
+}
+.menu-item__arrow { color: var(--text-quaternary); flex-shrink: 0; }
+
+/* ── Bottom spacer ── */
+.page-bottom {
+  padding-bottom: calc(var(--tabbar-height) + var(--safe-area-bottom) + var(--space-8));
+}
+
+/* ── Status bar ── */
+.status-bar {
+  height: 44px; background: var(--brand-purple-500);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; color: rgba(255,255,255,0.7);
+  font-size: 12px; font-weight: 500;
+}
+.status-bar__time { letter-spacing: 0.5px; }
+.status-bar__icons { display: flex; align-items: center; gap: 6px; }
+</style>
+</head>
+<body class="miniapp" style="margin:0; background:var(--bg-page);">
+
+<!-- ═══════ Status Bar ═══════ -->
+<div class="status-bar">
+  <span class="status-bar__time">9:41</span>
+  <span class="status-bar__icons">
+    <svg width="16" height="11" viewBox="0 0 16 11"><rect x="0" y="7" width="2.5" height="4" rx="0.5" fill="white"/><rect x="3.5" y="5" width="2.5" height="6" rx="0.5" fill="white"/><rect x="7" y="2.5" width="2.5" height="8.5" rx="0.5" fill="white"/><rect x="10.5" y="0" width="2.5" height="11" rx="0.5" fill="white"/></svg>
+    <span style="font-size:12px;">5G</span>
+    <svg width="24" height="11" viewBox="0 0 24 11"><rect x="0" y="0" width="22" height="11" rx="2.5" stroke="white" stroke-width="1" fill="none"/><rect x="2" y="2" width="16" height="7" rx="1.5" fill="white"/><rect x="20.5" y="3.5" width="1.8" height="4" rx="0.5" fill="white"/></svg>
+  </span>
+</div>
+
+<!-- ═══════ Profile Header ═══════ -->
+<div class="profile-header">
+  <div class="profile-header__avatar">
+    <div class="avatar avatar--xl" style="background:white;color:var(--brand-purple-500);font-size:36px;width:88px;height:88px;">林</div>
+  </div>
+  <div class="profile-header__name">林间漫步</div>
+  <div class="profile-header__bio">用画笔记录生活，用文字讲述故事</div>
+  <button class="profile-edit-btn" aria-label="编辑资料">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 11.5V14h2.5l7.9-7.9-2.5-2.5L2 11.5z" fill="white"/><path d="M12.8 3.3l2.1 2.1-1.1 1.1-2.1-2.1 1.1-1.1z" fill="white"/></svg>
+  </button>
+</div>
+
+<!-- ═══════ Stat Card ═══════ -->
+<div class="profile-stats">
+  <div class="stat-card">
+    <div class="stat-item">
+      <span class="stat-item__value">12</span>
+      <span class="stat-item__label">创意</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-item__value">8</span>
+      <span class="stat-item__label">认领</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-item__value">36</span>
+      <span class="stat-item__label">收藏</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-item__value">1.2k</span>
+      <span class="stat-item__label">获赞</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ 内容区：Tab + 列表 ═══════ -->
+<div class="profile-tabs">
+  <span class="profile-tab profile-tab--active">我的创意</span>
+  <span class="profile-tab">我的认领</span>
+  <span class="profile-tab">我的收藏</span>
+</div>
+
+<div class="content-list">
+  <!-- Item 1 — 有图片 -->
+  <div class="content-item">
+    <div class="content-item__thumb" style="background:linear-gradient(135deg,#FFE4C4,#FFDAB9);">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" opacity="0.35"><circle cx="12" cy="9" r="5" fill="#FF9800"/><rect x="4" y="14" width="16" height="10" rx="3" fill="#4CAF50"/></svg>
+    </div>
+    <div class="content-item__info">
+      <div class="content-item__title">春天的野餐 · 插画系列</div>
+      <div class="content-item__meta">
+        <span>插画</span>
+        <span>·</span>
+        <span>2天前</span>
+      </div>
+    </div>
+    <div class="content-item__stats">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L7.5 4.5 11 5l-2.5 2.3.6 4.2L6 9.5 3 11.5l.6-4.2L1 5l3.5-.5L6 1z" stroke="#999" stroke-width="1"/></svg>
+      128
+    </div>
+  </div>
+
+  <!-- Item 2 — 纯文字 -->
+  <div class="content-item">
+    <div class="content-item__thumb" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9);">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" opacity="0.3"><rect x="3" y="2" width="16" height="18" rx="2" stroke="#999" stroke-width="1.5"/><line x1="7" y1="7" x2="15" y2="7" stroke="#999" stroke-width="1.2"/><line x1="7" y1="11" x2="13" y2="11" stroke="#999" stroke-width="1.2"/><line x1="7" y1="15" x2="10" y2="15" stroke="#999" stroke-width="1.2"/></svg>
+    </div>
+    <div class="content-item__info">
+      <div class="content-item__title">一段关于「等待」的文字创意</div>
+      <div class="content-item__meta">
+        <span>写作</span>
+        <span>·</span>
+        <span>5天前</span>
+      </div>
+    </div>
+    <div class="content-item__stats">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L7.5 4.5 11 5l-2.5 2.3.6 4.2L6 9.5 3 11.5l.6-4.2L1 5l3.5-.5L6 1z" stroke="#999" stroke-width="1"/></svg>
+      203
+    </div>
+  </div>
+
+  <!-- Item 3 — 有图片 -->
+  <div class="content-item">
+    <div class="content-item__thumb" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB);">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" opacity="0.35"><circle cx="12" cy="12" r="8" fill="#FFB74D"/><path d="M6 12l4 4 8-8" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="content-item__info">
+      <div class="content-item__title">城市夜行者 · 街头摄影</div>
+      <div class="content-item__meta">
+        <span>摄影</span>
+        <span>·</span>
+        <span>1周前</span>
+      </div>
+    </div>
+    <div class="content-item__stats">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L7.5 4.5 11 5l-2.5 2.3.6 4.2L6 9.5 3 11.5l.6-4.2L1 5l3.5-.5L6 1z" stroke="#999" stroke-width="1"/></svg>
+      89
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ 常用功能 ═══════ -->
+<div class="section-heading">常用功能</div>
+
+<div class="profile-menu">
+  <div class="menu-item">
+    <div class="menu-item__icon-wrap">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 3h14v2H3zm0 6h14v2H3zm0 6h10v2H3z" stroke="#666" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <span class="menu-item__label">草稿箱</span>
+    <span class="menu-item__extra">2篇</span>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="menu-item__arrow"><path d="M5 2.5L9.5 7 5 11.5" stroke="#BFBFBF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+
+</div>
+
+<!-- ═══════ 其他 ═══════ -->
+<div class="section-heading">其他</div>
+
+<div class="profile-menu">
+  <div class="menu-item">
+    <div class="menu-item__icon-wrap">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#666" stroke-width="1.5"/><path d="M10 6v4l2.5 2.5" stroke="#666" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <span class="menu-item__label">反馈建议</span>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="menu-item__arrow"><path d="M5 2.5L9.5 7 5 11.5" stroke="#BFBFBF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+
+  <div class="menu-item">
+    <div class="menu-item__icon-wrap">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" stroke="#666" stroke-width="1.5"/><path d="M17.5 10c0 4.1-3.4 7.5-7.5 7.5S2.5 14.1 2.5 10 5.9 2.5 10 2.5s7.5 3.4 7.5 7.5z" stroke="#666" stroke-width="1.5"/></svg>
+    </div>
+    <span class="menu-item__label">设置</span>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="menu-item__arrow"><path d="M5 2.5L9.5 7 5 11.5" stroke="#BFBFBF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+</div>
+
+<div class="page-bottom"></div>
+
+<!-- ═══════ TabBar ═══════ -->
+<div class="tabbar">
+  <div class="tabbar__item">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 10l8-7.5L19 10v8.5c0 .55-.45 1-1 1h-4v-6h-6v6H4c-.55 0-1-.45-1-1V10z" fill="currentColor"/></svg>
+    <span>首页</span>
+  </div>
+  <div class="tabbar__item">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 19l-1.45-1.32C5.4 14.36 2 11.71 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.21-3.4 5.86-7.55 9.18L11 19z" fill="currentColor"/></svg>
+    <span>关注</span>
+  </div>
+  <div class="tabbar__item tabbar__item--publish">
+    <div class="tabbar__publish-btn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
+    </div>
+    <span>发布</span>
+  </div>
+  <div class="tabbar__item">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M17 16H5c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v7c0 1.1-.9 2-2 2z" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="8.5" r="1.3" fill="currentColor"/></svg>
+    <span>消息</span>
+  </div>
+  <div class="tabbar__item tabbar__item--active">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" fill="currentColor"/><path d="M3 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <span>我的</span>
+  </div>
+</div>
+
+</body>
+</html>

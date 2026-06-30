@@ -1,0 +1,122 @@
+<!-- pages/profile/profile.wxml -->
+<view class="page">
+  <!-- 自定义导航栏（透明沉浸式） -->
+  <navbar
+    type="transparent"
+    showBack="{{false}}"
+  ></navbar>
+
+  <!-- 顶部渐变背景区 -->
+  <view class="header">
+    <!-- 编辑按钮 -->
+    <view class="edit-btn" bindtap="onEdit">
+      <text class="edit-btn__icon">✏️</text>
+    </view>
+
+    <!-- 用户信息 -->
+    <view class="user-info">
+      <image wx:if="{{userInfo.avatar}}" class="user-info__avatar" src="{{userInfo.avatar}}" mode="aspectFill"></image>
+      <view wx:else class="user-info__avatar user-info__avatar--default">👤</view>
+
+      <view class="user-info__detail">
+        <text class="user-info__name">{{userInfo.name || '微信用户'}}</text>
+        <text wx:if="{{userInfo.id}}" class="user-info__id">ID: {{userInfo.id}}</text>
+        <text wx:if="{{userInfo.bio}}" class="user-info__bio">{{userInfo.bio}}</text>
+      </view>
+    </view>
+
+    <!-- 数据卡片 -->
+    <view class="stats-card">
+      <view class="stats-card__item" bindtap="onStatsClick" data-type="posts">
+        <text class="stats-card__value">{{stats.posts}}</text>
+        <text class="stats-card__label">发布</text>
+      </view>
+      <view class="stats-card__divider"></view>
+      <view class="stats-card__item" bindtap="onStatsClick" data-type="following">
+        <text class="stats-card__value">{{stats.following}}</text>
+        <text class="stats-card__label">关注</text>
+      </view>
+      <view class="stats-card__divider"></view>
+      <view class="stats-card__item" bindtap="onStatsClick" data-type="followers">
+        <text class="stats-card__value">{{stats.followers}}</text>
+        <text class="stats-card__label">粉丝</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 内容 Tab -->
+  <view class="content-tabs">
+    <view
+      class="content-tab {{activeTab === 0 ? 'content-tab--active' : ''}}"
+      bindtap="onTabChange"
+      data-index="0"
+    >
+      <text class="content-tab__text">我的创意</text>
+      <view wx:if="{{activeTab === 0}}" class="content-tab__indicator"></view>
+    </view>
+    <view
+      class="content-tab {{activeTab === 1 ? 'content-tab--active' : ''}}"
+      bindtap="onTabChange"
+      data-index="1"
+    >
+      <text class="content-tab__text">认领</text>
+      <view wx:if="{{activeTab === 1}}" class="content-tab__indicator"></view>
+    </view>
+    <view
+      class="content-tab {{activeTab === 2 ? 'content-tab--active' : ''}}"
+      bindtap="onTabChange"
+      data-index="2"
+    >
+      <text class="content-tab__text">收藏</text>
+      <view wx:if="{{activeTab === 2}}" class="content-tab__indicator"></view>
+    </view>
+  </view>
+
+  <!-- 内容列表 -->
+  <scroll-view
+    scroll-y
+    class="content-list"
+  >
+    <block wx:if="{{contentList.length > 0}}">
+      <creativity-card
+        wx:for="{{contentList}}"
+        wx:key="_id"
+        data="{{item}}"
+        bind:click="onCardClick"
+        bind:like="onLike"
+        bind:favorite="onFavorite"
+      ></creativity-card>
+      <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
+    </block>
+
+    <empty-state
+      wx:if="{{contentList.length === 0 && !loading}}"
+      icon="📝"
+      text="暂无内容"
+      sub-text="快去发布第一个创意吧"
+    ></empty-state>
+  </scroll-view>
+
+  <!-- 常用功能（简易版） -->
+  <view class="functions">
+    <view class="functions__title">常用功能</view>
+    <view class="functions__list">
+      <view class="functions__item" bindtap="onFunctionClick" data-type="inspiration">
+        <text class="functions__item-icon">💡</text>
+        <text class="functions__item-text">创作灵感</text>
+      </view>
+      <view class="functions__item" bindtap="onFunctionClick" data-type="drafts">
+        <text class="functions__item-icon">📄</text>
+        <text class="functions__item-text">草稿箱</text>
+      </view>
+      <view class="functions__item" bindtap="onFunctionClick" data-type="history">
+        <text class="functions__item-icon">🕐</text>
+        <text class="functions__item-text">浏览记录</text>
+      </view>
+      <view class="functions__item" bindtap="onFunctionClick" data-type="settings">
+        <text class="functions__item-icon">⚙️</text>
+        <text class="functions__item-text">设置</text>
+      </view>
+    </view>
+  </view>
+</view>

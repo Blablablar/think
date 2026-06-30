@@ -1,60 +1,78 @@
 <!-- components/creativity-card/index.wxml -->
 <view class="card" bindtap="onCardClick">
   <!-- 作者信息 -->
-  <view class="author" wx:if="{{showAuthor}}">
-    <image wx:if="{{data.author.avatarUrl}}" class="avatar" src="{{data.author.avatarUrl}}" mode="aspectFill"></image>
-    <view wx:else class="avatar avatar-default">👤</view>
-    <text class="nickname ellipsis">{{data.author.nickName || '微信用户'}}</text>
-    <text class="time">{{data.date}}</text>
+  <view class="author">
+    <image wx:if="{{data.author.avatar}}" class="author__avatar" src="{{data.author.avatar}}" mode="aspectFill"></image>
+    <view wx:else class="author__avatar author__avatar--default">👤</view>
+    <text class="author__name ellipsis">{{data.author.name || '微信用户'}}</text>
+    <text class="author__time">{{data.createdAt}}</text>
   </view>
 
-  <!-- 创意内容 -->
-  <view class="content ellipsis-3">{{data.content}}</view>
-
-  <!-- 图片网格 -->
-  <view class="image-grid" wx:if="{{data.images.length > 0}}">
-    <image
-      wx:for="{{data.images}}"
-      wx:key="*this"
-      wx:if="{{index < 3}}"
-      class="image"
-      src="{{item}}"
-      mode="aspectFill"
-      lazy-load
-      bindtap="onPreviewImage"
-      data-index="{{index}}"
-    ></image>
-    <view class="image-more" wx:if="{{data.images.length > 3}}">
-      +{{data.images.length - 3}}
-    </view>
+  <!-- 推荐理由标签 -->
+  <view wx:if="{{data.recommendReason}}" class="recommend-reason">
+    <text class="recommend-reason__text">{{data.recommendReason}}</text>
   </view>
 
-  <!-- 标签 -->
-  <view class="tags" wx:if="{{data.tags.length > 0}}">
-    <view
-      wx:for="{{data.tags}}"
-      wx:key="*this"
-      class="tag"
-      catchtap="onTagClick"
-      data-tag="{{item}}"
-    >{{item}}</view>
+  <!-- 标题 -->
+  <view wx:if="{{data.title}}" class="title">
+    <text>{{data.title}}</text>
   </view>
 
-  <!-- 底部操作栏 -->
+  <!-- 摘要 -->
+  <view wx:if="{{data.summary}}" class="summary ellipsis-2">
+    <text>{{data.summary}}</text>
+  </view>
+
+  <!-- 图片展示 -->
+  <view wx:if="{{data.images.length > 0}}" class="images">
+    <!-- 单图：全宽 -->
+    <block wx:if="{{data.images.length === 1}}">
+      <image
+        class="images__single"
+        src="{{data.images[0]}}"
+        mode="aspectFill"
+        lazy-load
+        bindtap="onPreviewImage"
+        data-index="0"
+      ></image>
+    </block>
+
+    <!-- 多图：横滑 -->
+    <block wx:else>
+      <scroll-view scroll-x class="images__multi-scroll">
+        <view class="images__multi-list">
+          <image
+            wx:for="{{data.images}}"
+            wx:key="*this"
+            class="images__multi-item"
+            src="{{item}}"
+            mode="aspectFill"
+            lazy-load
+            bindtap="onPreviewImage"
+            data-index="{{index}}"
+          ></image>
+        </view>
+      </scroll-view>
+    </block>
+  </view>
+
+  <!-- 底部互动栏 -->
   <view class="footer">
-    <view class="stats">
-      <view class="btn {{data.isLiked ? 'btn-active' : ''}}" catchtap="onLike">
-        <text class="btn-icon">♡</text>
-        <text class="btn-text">{{data.likeCount}}</text>
+    <view class="footer__left">
+      <view class="footer__btn" catchtap="onLike">
+        <text class="footer__btn-icon">{{data.stats.likes > 0 ? '♡' : '♡'}}</text>
+        <text class="footer__btn-text">{{data.stats.likes || 0}}</text>
       </view>
-      <view class="btn {{data.isDisliked ? 'btn-dislike' : ''}}" catchtap="onDislike">
-        <text class="btn-icon">✗</text>
-        <text class="btn-text">{{data.dislikeCount}}</text>
+      <view class="footer__btn" catchtap="onComment">
+        <text class="footer__btn-icon">💬</text>
+        <text class="footer__btn-text">{{data.stats.comments || 0}}</text>
       </view>
-      <view class="stat-item">认领 {{data.claimCount}}</view>
     </view>
-    <view class="fav-btn {{data.isFavorited ? 'fav-active' : ''}}" catchtap="onFavorite">
-      {{data.isFavorited ? '★' : '☆'}}
+
+    <view class="footer__right">
+      <view class="footer__fav {{data.isFavorited ? 'footer__fav--active' : ''}}" catchtap="onFavorite">
+        <text>{{data.isFavorited ? '★' : '☆'}}</text>
+      </view>
     </view>
   </view>
 </view>

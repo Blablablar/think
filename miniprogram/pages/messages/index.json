@@ -1,7 +1,6 @@
 {
-  "navigationBarTitleText": "消息中心",
-  "enablePullDownRefresh": true,
   "usingComponents": {
-    "empty-state": "/components/empty-state/index"
-  }
+    "navbar": "/components/navbar/index"
+  },
+  "navigationStyle": "custom"
 }

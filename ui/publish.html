@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0">
+<title>灵感岛 · 发布创意</title>
+<link rel="stylesheet" href="design-system.css">
+<style>
+/* ── Form Field ── */
+.field {}
+.field__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-3);
+}
+.field__label-dot {
+  width: 6px; height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--brand-purple-500);
+  flex-shrink: 0;
+}
+.field__hint {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  margin-top: var(--space-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.field__hint--right {
+  justify-content: flex-end;
+}
+
+/* ── Ghost Inputs (borderless on white card) ── */
+.input-ghost {
+  width: 100%;
+  border: none;
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+  font-family: var(--font-stack);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  outline: none;
+  transition: background var(--duration-fast) var(--ease-out-quart);
+  -webkit-appearance: none;
+}
+.input-ghost::placeholder { color: var(--text-placeholder); }
+.input-ghost:focus { background: var(--brand-purple-50); }
+
+.input-ghost--title {
+  height: 44px;
+  padding: 0 var(--space-4);
+  font-weight: var(--weight-semibold);
+}
+
+/* ── Content Editor (inline text + images) ── */
+.content-editor {
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.content-para {
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--text-primary);
+  outline: none;
+  min-height: 1.5em;
+  font-family: var(--font-stack);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.content-para--placeholder {
+  color: var(--text-placeholder);
+}
+.content-para--empty {
+  color: var(--text-placeholder);
+  min-height: 1em;
+}
+
+/* ── Inline Image ── */
+.inline-image {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 16/10;
+}
+.inline-image__img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.inline-image__remove {
+  position: absolute;
+  top: var(--space-2); right: var(--space-2);
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  transition: background var(--duration-fast);
+}
+.inline-image__remove:active { background: rgba(0,0,0,0.7); }
+
+/* ── Inline Add Image Button ── */
+.inline-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-default);
+  background: transparent;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  font-family: var(--font-stack);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+.inline-add:active { background: var(--white); border-color: var(--brand-purple-400); color: var(--brand-purple-500); }
+
+/* ── Tags Grid ── */
+.tag-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 var(--space-3);
+  border-radius: 14px;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-stack);
+  background: var(--bg-tag);
+  color: var(--text-secondary);
+  transition: all var(--duration-fast) var(--ease-out-quart);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.tag-pill:active { background: var(--brand-purple-100); color: var(--brand-purple-500); }
+.tag-pill--selected {
+  background: var(--brand-purple-50);
+  color: var(--brand-purple-500);
+  font-weight: var(--weight-medium);
+}
+
+/* ── Bottom Bar ── */
+.publish-bottom {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  padding: var(--space-3) var(--space-4);
+  padding-bottom: calc(var(--safe-area-bottom) + var(--space-3));
+  background: var(--white);
+  border-top: 0.5px solid var(--border-divider);
+  z-index: 50;
+}
+.publish-submit {
+  width: 100%;
+  height: 46px;
+  border-radius: var(--radius-lg);
+  border: none;
+  background: var(--brand-purple-500);
+  color: var(--text-on-brand);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  font-family: var(--font-stack);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  letter-spacing: 0.5px;
+  transition: all var(--duration-fast) var(--ease-out-quart);
+}
+.publish-submit:active {
+  background: var(--brand-purple-600);
+  transform: scale(0.98);
+}
+
+/* ── Draft hint ── */
+.draft-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  margin-top: var(--space-2);
+}
+.draft-hint svg { flex-shrink: 0; }
+</style>
+</head>
+<body class="miniapp" style="margin:0;">
+
+<!-- Status Bar -->
+<div class="status-bar">
+  <span class="status-bar__time">9:41</span>
+  <span class="status-bar__icons">
+    <svg width="16" height="11" viewBox="0 0 16 11"><rect x="0" y="7" width="2.5" height="4" rx="0.5" fill="white"/><rect x="3.5" y="5" width="2.5" height="6" rx="0.5" fill="white"/><rect x="7" y="2.5" width="2.5" height="8.5" rx="0.5" fill="white"/><rect x="10.5" y="0" width="2.5" height="11" rx="0.5" fill="white"/></svg>
+    <span style="font-size:12px;">5G</span>
+    <svg width="24" height="11" viewBox="0 0 24 11"><rect x="0" y="0" width="22" height="11" rx="2.5" stroke="white" stroke-width="1" fill="none"/><rect x="2" y="2" width="16" height="7" rx="1.5" fill="white"/><rect x="20.5" y="3.5" width="1.8" height="4" rx="0.5" fill="white"/></svg>
+  </span>
+</div>
+
+<!-- Navbar -->
+<div class="navbar">
+  <span class="navbar__back" style="left:var(--space-4);">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12.5 3L6.5 10l6 7" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </span>
+  <span class="navbar__title">发布创意</span>
+</div>
+
+<!-- Page Content -->
+<div class="page-content" style="padding-bottom:130px;">
+
+  <!-- Title -->
+    <div class="field" style="margin-top:var(--space-4);">
+      <div class="field__label">
+        <span class="field__label-dot"></span>
+        标题
+      </div>
+      <input class="input-ghost input-ghost--title" type="text" placeholder="给你的创意起个名字吧" value="春天的野餐">
+      <div class="field__hint field__hint--right">
+        <span>7/30</span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="field">
+      <div class="field__label">
+        <span class="field__label-dot"></span>
+        正文
+      </div>
+      <div class="content-editor">
+        <!-- Paragraph 1 -->
+        <div class="content-para">用温柔的色调记录春天里的一次野餐。这幅作品尝试捕捉阳光透过树叶洒在野餐布上的瞬间，那种斑驳的光影让人感到宁静而美好。</div>
+
+        <!-- Inline Image 1 -->
+        <div class="inline-image">
+          <svg class="inline-image__img" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FEF3C7"/><stop offset="100%" stop-color="#FDE68A"/></linearGradient></defs>
+            <rect width="320" height="200" fill="url(#g1)"/>
+            <circle cx="100" cy="80" r="50" fill="#F59E0B" opacity="0.15"/>
+            <circle cx="200" cy="120" r="30" fill="#D97706" opacity="0.12"/>
+            <rect x="40" y="150" width="240" height="6" rx="3" fill="#D97706" opacity="0.25"/>
+            <rect x="60" y="165" width="200" height="4" rx="2" fill="#D97706" opacity="0.2"/>
+            <rect x="80" y="175" width="160" height="4" rx="2" fill="#D97706" opacity="0.15"/>
+          </svg>
+          <button class="inline-image__remove">
+            <svg width="12" height="12" viewBox="0 0 12 12"><line x1="2" y1="2" x2="10" y2="10" stroke="white" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="2" x2="2" y2="10" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <!-- Paragraph 2 -->
+        <div class="content-para">选用了柔和的暖色系——淡黄、浅绿和奶油白，画面中心是一块铺在草地上的格子野餐布，上面散落着水果、面包和一本书。</div>
+
+        <!-- Inline Image 2 -->
+        <div class="inline-image">
+          <svg class="inline-image__img" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#D1FAE5"/><stop offset="100%" stop-color="#A7F3D0"/></linearGradient></defs>
+            <rect width="320" height="200" fill="url(#g2)"/>
+            <circle cx="80" cy="140" r="40" fill="#10B981" opacity="0.12"/>
+            <circle cx="240" cy="60" r="25" fill="#059669" opacity="0.1"/>
+            <rect x="40" y="15" width="65" height="4" rx="2" fill="#047857" opacity="0.25"/>
+            <rect x="40" y="25" width="50" height="4" rx="2" fill="#047857" opacity="0.2"/>
+          </svg>
+          <button class="inline-image__remove">
+            <svg width="12" height="12" viewBox="0 0 12 12"><line x1="2" y1="2" x2="10" y2="10" stroke="white" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="2" x2="2" y2="10" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <!-- Paragraph 3 -->
+        <div class="content-para">光斑散落在画面中，通过水彩的晕染技法让整个场景有种朦胧的梦境感。希望看到这幅作品的人能感受到那个悠闲午后的温度。</div>
+
+        <!-- Inline Add Button -->
+        <button class="inline-add">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="3" x2="8" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="3" y1="8" x2="13" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          在此处插入图片
+        </button>
+
+        <!-- Placeholder cursor -->
+        <div class="content-para content-para--empty">继续编辑...</div>
+      </div>
+
+      <div class="field__hint">
+        <span>已自动保存草稿</span>
+        <span>78/500</span>
+      </div>
+    </div>
+
+    <!-- Tags -->
+    <div class="field" style="margin-top:var(--space-6);">
+      <div class="field__label">
+        <span class="field__label-dot"></span>
+        分类标签
+      </div>
+      <div class="tag-grid">
+        <button class="tag-pill tag-pill--selected">插画</button>
+        <button class="tag-pill">摄影</button>
+        <button class="tag-pill">写作</button>
+        <button class="tag-pill">音乐</button>
+        <button class="tag-pill">视频</button>
+        <button class="tag-pill">手工</button>
+        <button class="tag-pill">生活</button>
+        <button class="tag-pill">科技</button>
+      </div>
+      <div class="field__hint">为创意添加一个分类，更容易被发现</div>
+    </div>
+
+
+</div>
+
+<!-- Bottom Submit -->
+<div class="publish-bottom">
+  <button class="publish-submit">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    发布创意
+  </button>
+</div>
+
+</body>
+</html>

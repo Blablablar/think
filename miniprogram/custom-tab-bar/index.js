@@ -2,11 +2,11 @@ Component({
   data: {
     active: 0,
     list: [
-      { pagePath: '/pages/today/index', text: '今日', icon: '🏠' },
-      { pagePath: '/pages/hot/index', text: '热门', icon: '🔥' },
+      { pagePath: '/pages/home/home', text: '首页', icon: '🏠' },
+      { pagePath: '/pages/following/following', text: '关注', icon: '♥' },
       { pagePath: '/pages/publish/index', text: '发布', icon: '' },
-      { pagePath: '/pages/recommend/index', text: '推荐', icon: '🎲' },
-      { pagePath: '/pages/my/index', text: '我的', icon: '👤' }
+      { pagePath: '/pages/messages/index', text: '消息', icon: '💬' },
+      { pagePath: '/pages/profile/profile', text: '我的', icon: '👤' }
     ]
   },
 

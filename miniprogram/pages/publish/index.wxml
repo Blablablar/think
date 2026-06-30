@@ -1,55 +1,73 @@
 <!-- pages/publish/index.wxml -->
 <view class="page">
-  <scroll-view scroll-y class="content">
-    <!-- 文本输入 -->
-    <view class="content-card">
+  <!-- 自定义导航栏 -->
+  <navbar
+    type="purple"
+    title="发布创意"
+    right-text="取消"
+    bind:rightClick="onCancel"
+  ></navbar>
+
+  <scroll-view scroll-y class="content" enhanced show-scrollbar="{{false}}">
+    <!-- 正文输入区 -->
+    <view class="input-area">
       <textarea
-        class="text-area"
-        placeholder="分享你的创意灵感..."
+        class="text-input"
+        placeholder="记录你的灵感..."
+        placeholder-class="placeholder"
         value="{{content}}"
         bindinput="onContentInput"
         maxlength="{{maxContent}}"
         auto-height
+        cursor-spacing="100"
       ></textarea>
-      <view class="char-count">{{content.length}}/{{maxContent}}</view>
-    </view>
 
-    <!-- 语音按钮 -->
-    <view class="content-card">
-      <view class="voice-btn" bindtap="onVoiceClick">
-        <view class="mic-icon">🎤</view>
-        <view class="voice-text">点击或长按录音</view>
-      </view>
-    </view>
-
-    <!-- 图片上传 -->
-    <view class="content-card">
-      <view class="section-label">配图（可选）</view>
-      <view class="image-grid">
-        <view class="image-item" wx:for="{{images}}" wx:key="*this">
+      <!-- 已插入的图片 -->
+      <view class="image-list" wx:if="{{images.length > 0}}">
+        <view class="image-item" wx:for="{{images}}" wx:key="index">
           <image class="image-preview" src="{{item}}" mode="aspectFill"></image>
+          <view class="image-overlay"></view>
           <view class="image-delete" catchtap="onDeleteImage" data-index="{{index}}">✕</view>
         </view>
-        <view class="add-image" wx:if="{{images.length < 9}}" bindtap="onChooseImage">
+
+        <!-- 插入图片入口 -->
+        <view class="add-image-btn" wx:if="{{images.length < 9}}" bindtap="onChooseImage">
           <view class="add-icon">+</view>
-          <view class="add-text">添加图片</view>
+          <view class="add-text">插入图片</view>
+        </view>
+      </view>
+
+      <!-- 无图片时的插入图片入口 -->
+      <view class="insert-image" wx:if="{{images.length === 0}}" bindtap="onChooseImage">
+        <view class="insert-line"></view>
+        <view class="insert-text">点击插入图片</view>
+        <view class="insert-line"></view>
+      </view>
+    </view>
+
+    <!-- 分类标签选择 -->
+    <view class="tag-section">
+      <view class="tag-list">
+        <view
+          class="tag-item {{selectedTags.indexOf(item) > -1 ? 'tag-item--active' : ''}}"
+          wx:for="{{tagOptions}}"
+          wx:key="*this"
+          bindtap="onToggleTag"
+          data-tag="{{item}}"
+        >
+          {{item}}
         </view>
       </view>
     </view>
 
-    <!-- 标签选择 -->
-    <view class="content-card">
-      <view class="section-label">选择标签（必选）</view>
-      <tag-selector
-        selected-tags="{{selectedTags}}"
-        bind:change="onTagsChange"
-      ></tag-selector>
+    <!-- 草稿提示 -->
+    <view class="draft-tip" wx:if="{{showDraftTip}}">
+      <text>已自动保存草稿</text>
     </view>
   </scroll-view>
 
-  <!-- 底部按钮 -->
+  <!-- 底部发布按钮 -->
   <view class="bottom-bar">
-    <button class="draft-btn" bindtap="onSaveDraft" disabled="{{publishing}}">保存草稿</button>
     <button
       class="publish-btn"
       bindtap="onPublish"

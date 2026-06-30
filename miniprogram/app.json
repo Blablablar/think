@@ -1,36 +1,44 @@
 {
   "pages": [
-    "pages/today/index",
-    "pages/hot/index",
-    "pages/recommend/index",
-    "pages/publish/index",
-    "pages/my/index",
-    "pages/detail/index",
-    "pages/tag/index",
-    "pages/submitImpl/index",
-    "pages/search/index",
-    "pages/user/index",
-    "pages/messages/index"
+    "pages/home/home",
+    "pages/following/following",
+    "pages/publish/publish",
+    "pages/messages/messages",
+    "pages/profile/profile",
+    "pages/detail/detail"
   ],
   "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#6c5ce7",
-    "navigationBarTitleText": "灵光",
-    "navigationBarTextStyle": "white"
+    "navigationStyle": "custom",
+    "backgroundTextStyle": "light"
   },
   "tabBar": {
-    "color": "#b2bec3",
-    "selectedColor": "#6c5ce7",
-    "backgroundColor": "#ffffff",
+    "color": "#999999",
+    "selectedColor": "#534AB7",
+    "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
+    "custom": true,
     "list": [
-      { "pagePath": "pages/today/index", "text": "今日" },
-      { "pagePath": "pages/hot/index", "text": "热门" },
-      { "pagePath": "pages/publish/index", "text": "发布" },
-      { "pagePath": "pages/recommend/index", "text": "推荐" },
-      { "pagePath": "pages/my/index", "text": "我的" }
-    ],
-    "custom": true
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/following/following",
+        "text": "关注"
+      },
+      {
+        "pagePath": "pages/publish/publish",
+        "text": "发布"
+      },
+      {
+        "pagePath": "pages/messages/messages",
+        "text": "消息"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",

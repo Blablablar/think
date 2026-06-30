@@ -1,0 +1,91 @@
+<!-- pages/following/following.wxml -->
+<view class="page">
+  <!-- 自定义导航栏 -->
+  <navbar
+    type="purple"
+    title="关注"
+  ></navbar>
+
+  <!-- Tab 切换 -->
+  <view class="tabs">
+    <view
+      class="tab {{activeTab === 0 ? 'tab--active' : ''}}"
+      bindtap="onTabChange"
+      data-index="0"
+    >
+      <text class="tab__text">关注</text>
+      <view wx:if="{{activeTab === 0}}" class="tab__indicator"></view>
+    </view>
+    <view
+      class="tab {{activeTab === 1 ? 'tab--active' : ''}}"
+      bindtap="onTabChange"
+      data-index="1"
+    >
+      <text class="tab__text">收藏</text>
+      <view wx:if="{{activeTab === 1}}" class="tab__indicator"></view>
+    </view>
+  </view>
+
+  <!-- 页面内容 -->
+  <swiper
+    class="content"
+    current="{{activeTab}}"
+    bindchange="onSwiperChange"
+  >
+    <!-- 关注 Tab -->
+    <swiper-item class="swiper-item">
+      <scroll-view
+        scroll-y
+        class="list"
+        bindscrolltolower="onReachBottom"
+      >
+        <block wx:if="{{followingList.length > 0}}">
+          <creativity-card
+            wx:for="{{followingList}}"
+            wx:key="_id"
+            data="{{item}}"
+            bind:click="onCardClick"
+            bind:like="onLike"
+            bind:favorite="onFavorite"
+          ></creativity-card>
+          <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
+        </block>
+
+        <empty-state
+          wx:if="{{followingList.length === 0 && !loading}}"
+          icon="💡"
+          text="暂无关注内容"
+          sub-text="快去关注有趣的创作者吧"
+        ></empty-state>
+      </scroll-view>
+    </swiper-item>
+
+    <!-- 收藏 Tab -->
+    <swiper-item class="swiper-item">
+      <scroll-view
+        scroll-y
+        class="list"
+        bindscrolltolower="onReachBottom"
+      >
+        <block wx:if="{{favoriteList.length > 0}}">
+          <creativity-card
+            wx:for="{{favoriteList}}"
+            wx:key="_id"
+            data="{{item}}"
+            bind:click="onCardClick"
+            bind:like="onLike"
+            bind:favorite="onFavorite"
+          ></creativity-card>
+          <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
+        </block>
+
+        <empty-state
+          wx:if="{{favoriteList.length === 0 && !loading}}"
+          icon="⭐"
+          text="暂无收藏内容"
+          sub-text="快去收藏喜欢的创意吧"
+        ></empty-state>
+      </scroll-view>
+    </swiper-item>
+  </swiper>
+</view>

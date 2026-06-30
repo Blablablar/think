@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0">
+<title>灵感岛 · 关注</title>
+<link rel="stylesheet" href="design-system.css">
+<style>
+/* Page-specific overrides */
+.feed-card__meta {
+  display: flex; align-items: center; gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.feed-card__title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  line-height: var(--leading-tight);
+  margin-bottom: var(--space-2);
+}
+.feed-card__desc {
+  font-size: var(--text-md);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-3);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.feed-card__images {
+  display: flex; gap: 6px;
+  margin-bottom: var(--space-3);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.feed-card__images::-webkit-scrollbar { display: none; }
+.feed-card__img {
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.feed-card__img--single {
+  width: 100%; height: 160px;
+}
+.feed-card__img--multi {
+  width: 104px; height: 104px;
+}
+.feed-card__img-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.feed-card__tags {
+  display: flex; align-items: center; gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+.feed-card__stats {
+  display: flex; align-items: center; gap: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  padding-top: var(--space-3);
+  border-top: 0.5px solid var(--border-divider);
+}
+.feed-card__stat { display: flex; align-items: center; gap: 3px; }
+
+.avatar-name { font-size: var(--text-md); font-weight: var(--weight-medium); color: var(--text-primary); }
+.avatar-time { font-size: var(--text-sm); color: var(--text-tertiary); }
+
+/* Status bar */
+.status-bar {
+  height: 44px; background: var(--brand-purple-500);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; color: rgba(255,255,255,0.7);
+  font-size: 12px; font-weight: 500;
+}
+.status-bar__time { letter-spacing: 0.5px; }
+.status-bar__icons {
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* Sub-tabs: 关注 / 收藏 */
+.sub-tabs {
+  display: flex;
+  gap: var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  background: var(--white);
+}
+.sub-tabs__item {
+  position: relative;
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding-bottom: var(--space-2);
+  -webkit-tap-highlight-color: transparent;
+  transition: color var(--duration-fast);
+}
+.sub-tabs__item--active {
+  color: var(--brand-purple-500);
+  font-weight: var(--weight-semibold);
+}
+.sub-tabs__item--active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  border-radius: 1.5px;
+  background: var(--brand-purple-500);
+}
+
+/* Follow badge on card */
+.follow-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--text-xs);
+  color: var(--brand-purple-500);
+  font-weight: var(--weight-medium);
+  margin-left: auto;
+}
+
+/* Collected badge */
+.collect-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--text-2xs);
+  color: var(--text-tertiary);
+  background: #f5f3ff;
+  border-radius: 10px;
+  padding: 2px 8px;
+  margin-left: var(--space-2);
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-16) var(--space-4);
+  color: var(--text-tertiary);
+}
+.empty-state__icon {
+  width: 64px; height: 64px;
+  border-radius: var(--radius-full);
+  background: #f3f0ff;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: var(--space-4);
+}
+.empty-state__text {
+  font-size: var(--text-md);
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: var(--leading-relaxed);
+}
+
+</style>
+</head>
+<body class="miniapp" style="margin:0;">
+
+<!-- Status Bar -->
+<div class="status-bar">
+  <span class="status-bar__time">9:41</span>
+  <span class="status-bar__icons">
+    <svg width="16" height="11" viewBox="0 0 16 11"><rect x="0" y="7" width="2.5" height="4" rx="0.5" fill="white"/><rect x="3.5" y="5" width="2.5" height="6" rx="0.5" fill="white"/><rect x="7" y="2.5" width="2.5" height="8.5" rx="0.5" fill="white"/><rect x="10.5" y="0" width="2.5" height="11" rx="0.5" fill="white"/></svg>
+    <span style="font-size:12px;">5G</span>
+    <svg width="24" height="11" viewBox="0 0 24 11"><rect x="0" y="0" width="22" height="11" rx="2.5" stroke="white" stroke-width="1" fill="none"/><rect x="2" y="2" width="16" height="7" rx="1.5" fill="white"/><rect x="20.5" y="3.5" width="1.8" height="4" rx="0.5" fill="white"/></svg>
+  </span>
+</div>
+
+<!-- Navbar -->
+<div class="navbar">
+  <span class="navbar__title">关注</span>
+  <span class="navbar__action" style="right:16px;">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="white" stroke-width="1.5"/><line x1="13" y1="13" x2="17.5" y2="17.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </span>
+</div>
+
+<!-- Page Content -->
+<div class="page-content">
+
+  <!-- Sub Tabs: 关注 / 收藏 -->
+  <div class="sub-tabs">
+    <span class="sub-tabs__item sub-tabs__item--active">关注</span>
+    <span class="sub-tabs__item">收藏</span>
+  </div>
+
+  <!-- Feed List — 关注Tab -->
+  <div class="feed-list" style="margin-top:var(--space-1);">
+
+    <!-- Card 1 - 关注的用户 -->
+    <div class="card">
+      <div class="card__body">
+        <div class="feed-card__meta">
+          <div class="avatar avatar--sm" style="background:linear-gradient(135deg,#FF6B6B,#EE5A24);color:white;">墨</div>
+          <span class="avatar-name">墨染时光</span>
+          <span class="follow-badge">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5.5 1L6.9 4.2l3.1.3-2.3 2 .6 3L5.5 8 2.7 9.5l.6-3-2.3-2 3.1-.3L5.5 1z" fill="#534AB7"/></svg>
+            已关注
+          </span>
+          <span class="avatar-time">10分钟前</span>
+        </div>
+        <div class="feed-card__title">春天的野餐 · 插画系列</div>
+        <div class="feed-card__desc">用温柔的色调记录春天里的一次野餐。这幅作品尝试捕捉阳光透过树叶洒在野餐布上的瞬间，那种斑驳的光影让人感到宁静而美好。</div>
+        <div class="feed-card__images">
+          <div class="feed-card__img feed-card__img--single">
+            <div class="feed-card__img-placeholder" style="background:linear-gradient(135deg,#FFE4C4 0%,#FFDAB9 30%,#98FB98 70%,#87CEEB 100%);">
+              <svg width="60" height="60" viewBox="0 0 60 60" fill="none" opacity="0.35"><circle cx="32" cy="22" r="14" fill="#FFD700"/><rect x="4" y="32" width="52" height="28" rx="8" fill="#4CAF50"/><rect x="20" y="28" width="24" height="32" rx="3" fill="#FF6B6B"/><rect x="18" y="30" width="28" height="4" rx="2" fill="#FF4444"/><circle cx="28" cy="20" r="3" fill="#FFE4B5"/><circle cx="38" cy="18" r="2.5" fill="#FFE4B5"/><circle cx="34" cy="40" r="4" fill="#8BC34A"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="feed-card__tags">
+          <span class="tag tag--default">插画</span>
+          <span class="tag tag--green">已实现</span>
+        </div>
+        <div class="feed-card__stats">
+          <span class="feed-card__stat">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2.5C3.5 2.5 1 5.8 1 7c0 1.2 2.5 4.5 6 4.5s6-3.3 6-4.5c0-1.2-2.5-4.5-6-4.5z" stroke="#999" stroke-width="1.3"/><circle cx="7" cy="7" r="2" stroke="#999" stroke-width="1.3"/></svg>
+            286
+          </span>
+          <span class="feed-card__stat">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12 9.5c0 .8-.7 1.5-1.5 1.5h-7C2.7 11 2 10.3 2 9.5V4c0-.3.2-.5.5-.5h9c.3 0 .5.2.5.5v5.5z" stroke="#999" stroke-width="1.3"/><line x1="5" y1="6" x2="9" y2="6" stroke="#999" stroke-width="1" stroke-linecap="round"/><line x1="5" y1="8" x2="7.5" y2="8" stroke="#999" stroke-width="1" stroke-linecap="round"/></svg>
+            42
+          </span>
+          <span class="feed-card__stat" style="flex:1;text-align:right;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L8.8 5.2 13 5.8l-3 2.9.7 4.3L7 11l-3.7 2 .7-4.3-3-2.9 4.2-.6L7 1z" stroke="#999" stroke-width="1.3"/></svg>
+            128
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 - 关注的用户 -->
+    <div class="card">
+      <div class="card__body">
+        <div class="feed-card__meta">
+          <div class="avatar avatar--sm" style="background:linear-gradient(135deg,#4ECDC4,#44B09E);color:white;">花</div>
+          <span class="avatar-name">花房姑娘</span>
+          <span class="follow-badge">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5.5 1L6.9 4.2l3.1.3-2.3 2 .6 3L5.5 8 2.7 9.5l.6-3-2.3-2 3.1-.3L5.5 1z" fill="#534AB7"/></svg>
+            已关注
+          </span>
+          <span class="avatar-time">32分钟前</span>
+        </div>
+        <div class="feed-card__title">一段关于「等待」的文字创意</div>
+        <div class="feed-card__desc">等待不是时间的浪费，而是时间的沉淀。在匆忙的城市里，学会等待一朵花开、等待一杯茶凉，或许才是生活的真正节奏。</div>
+        <div class="feed-card__tags">
+          <span class="tag tag--default">写作</span>
+          <span class="tag tag--outline">3人认领</span>
+        </div>
+        <div class="feed-card__stats">
+          <span class="feed-card__stat">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2.5C3.5 2.5 1 5.8 1 7c0 1.2 2.5 4.5 6 4.5s6-3.3 6-4.5c0-1.2-2.5-4.5-6-4.5z" stroke="#999" stroke-width="1.3"/><circle cx="7" cy="7" r="2" stroke="#999" stroke-width="1.3"/></svg>
+            514
+          </span>
+          <span class="feed-card__stat">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12 9.5c0 .8-.7 1.5-1.5 1.5h-7C2.7 11 2 10.3 2 9.5V4c0-.3.2-.5.5-.5h9c.3 0 .5.2.5.5v5.5z" stroke="#999" stroke-width="1.3"/><line x1="5" y1="6" x2="9" y2="6" stroke="#999" stroke-width="1" stroke-linecap="round"/><line x1="5" y1="8" x2="7.5" y2="8" stroke="#999" stroke-width="1" stroke-linecap="round"/></svg>
+            67
+          </span>
+          <span class="feed-card__stat" style="flex:1;text-align:right;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L8.8 5.2 13 5.8l-3 2.9.7 4.3L7 11l-3.7 2 .7-4.3-3-2.9 4.2-.6L7 1z" stroke="#999" stroke-width="1.3"/></svg>
+            203
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 - 关注的用户 -->
+    <div class="card">
+      <div class="card__body">
+        <div class="feed-card__meta">
+          <div class="avatar avatar--sm" style="background:linear-gradient(135deg,#A78BFA,#7C3AED);color:white;">星</div>
+          <span class="avatar-name">星空摄影师</span>
+          <span class="follow-badge">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5.5 1L6.9 4.2l3.1.3-2.3 2 .6 3L5.5 8 2.7 9.5l.6-3-2.3-2 3.1-.3L5.5 1z" fill="#534AB7"/></svg>
+            已关注
+          </span>
+          <span class="avatar-time">1小时前</span>
+        </div>
+        <div class="feed-card__title">夏日限定·冰镇西瓜摄影计划</div>
+        <div class="feed-card__desc">想拍一组以「西瓜」为主题的夏日写真，红绿撞色搭配白色连衣裙，在午后的阳光里捕捉青春的味道。</div>
+        <div class="feed-card__images">
+          <div class="feed-card__img feed-card__img--multi">
+            <div class="feed-card__img-placeholder" style="background:linear-gradient(135deg,#FF6B6B 0%,#FF8E53 100%);">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none" opacity="0.4"><circle cx="18" cy="16" r="10" fill="#4CAF50"/><path d="M8 16a10 10 0 0 1 20 0" fill="#FF4444"/><ellipse cx="13" cy="14" rx="1.5" ry="2" fill="#222"/><ellipse cx="22" cy="12" rx="1.5" ry="2" fill="#222"/></svg>
+            </div>
+          </div>
+          <div class="feed-card__img feed-card__img--multi">
+            <div class="feed-card__img-placeholder" style="background:linear-gradient(135deg,#87CEEB 0%,#4682B4 100%);">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none" opacity="0.4"><circle cx="18" cy="18" r="10" fill="#FFD700"/><line x1="10" y1="20" x2="14" y2="20" stroke="#FF8C00" stroke-width="1.5"/><line x1="22" y1="20" x2="26" y2="20" stroke="#FF8C00" stroke-width="1.5"/><circle cx="14" cy="25" r="2" fill="#87CEEB"/><circle cx="22" cy="25" r="2" fill="#87CEEB"/></svg>
+            </div>
+          </div>
+          <div class="feed-card__img feed-card__img--multi">
+            <div class="feed-card__img-placeholder" style="background:linear-gradient(135deg,#98FB98 0%,#3CB371 100%);">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none" opacity="0.4"><rect x="6" y="8" width="24" height="20" rx="4" fill="#FF6347"/><path d="M6 16l6-4 6 6 6-6 6 6v8a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4V16z" fill="#32CD32" opacity="0.6"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="feed-card__tags">
+          <span class="tag tag--default">摄影</span>
+          <span class="tag tag--outline">5人认领</span>
+        </div>
+        <div class="feed-card__stats">
+          <span class="feed-card__stat">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2.5C3.5 2.5 1 5.8 1 7c0 1.2 2.5 4.5 6 4.5s6-3.3 6-4.5c0-1.2-2.5-4.5-6-4.5z" stroke="#999" stroke-width="1.3"/><circle cx="7" cy="7" r="2" stroke="#999" stroke-width="1.3"/></svg>
+            892
+          </span>
+          <span class="feed-card__stat">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12 9.5c0 .8-.7 1.5-1.5 1.5h-7C2.7 11 2 10.3 2 9.5V4c0-.3.2-.5.5-.5h9c.3 0 .5.2.5.5v5.5z" stroke="#999" stroke-width="1.3"/><line x1="5" y1="6" x2="9" y2="6" stroke="#999" stroke-width="1" stroke-linecap="round"/><line x1="5" y1="8" x2="7.5" y2="8" stroke="#999" stroke-width="1" stroke-linecap="round"/></svg>
+            103
+          </span>
+          <span class="feed-card__stat" style="flex:1;text-align:right;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L8.8 5.2 13 5.8l-3 2.9.7 4.3L7 11l-3.7 2 .7-4.3-3-2.9 4.2-.6L7 1z" stroke="#999" stroke-width="1.3"/></svg>
+            356
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4 - 关注的用户 -->
+    <div class="card">
+      <div class="card__body">
+        <div class="feed-card__meta">
+          <div class="avatar avatar--sm" style="background:linear-gradient(135deg,#F59E0B,#D97706);color:white;">三</div>
+          <span class="avatar-name">三明治工厂</span>
+          <span class="follow-badge">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5.5 1L6.9 4.2l3.1.3-2.3 2 .6 3L5.5 8 2.7 9.5l.6-3-2.3-2 3.1-.3L5.5 1z" fill="#534AB7"/></svg>
+            已关注
+          </span>
+          <span class="avatar-time">2小时前</span>
+        </div>
+        <div class="feed-card__title">手作陶瓷杯 · 从泥土到成品的旅程</div>
+        <div class="feed-card__desc">记录一只手工陶瓷杯的诞生——揉泥、拉坯、修坯、上釉、烧制。每一步都是与泥土的对话，每一件作品都独一无二。</div>
+        <div class="feed-card__images">
+          <div class="feed-card__img feed-card__img--single">
+            <div class="feed-card__img-placeholder" style="background:linear-gradient(135deg,#D2B48C 0%,#DEB887 40%,#8B4513 100%);">
+              <svg width="60" height="60" viewBox="0 0 60 60" fill="none" opacity="0.3"><ellipse cx="30" cy="35" rx="18" ry="12" fill="#8B4513"/><ellipse cx="30" cy="22" rx="14" ry="8" fill="#DEB887"/><ellipse cx="30" cy="15" rx="10" ry="4" fill="#F5DEB3"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="feed-card__tags">
+          <span class="tag tag--default">手工</span>
+        </div>
+        <div class="feed-card__stats">
+          <span class="feed-card__stat">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2.5C3.5 2.5 1 5.8 1 7c0 1.2 2.5 4.5 6 4.5s6-3.3 6-4.5c0-1.2-2.5-4.5-6-4.5z" stroke="#999" stroke-width="1.3"/><circle cx="7" cy="7" r="2" stroke="#999" stroke-width="1.3"/></svg>
+            1.2k
+          </span>
+          <span class="feed-card__stat">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12 9.5c0 .8-.7 1.5-1.5 1.5h-7C2.7 11 2 10.3 2 9.5V4c0-.3.2-.5.5-.5h9c.3 0 .5.2.5.5v5.5z" stroke="#999" stroke-width="1.3"/><line x1="5" y1="6" x2="9" y2="6" stroke="#999" stroke-width="1" stroke-linecap="round"/><line x1="5" y1="8" x2="7.5" y2="8" stroke="#999" stroke-width="1" stroke-linecap="round"/></svg>
+            89
+          </span>
+          <span class="feed-card__stat" style="flex:1;text-align:right;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11l-3.5 2 .7-4L1 6.1l4.3-.6L7 1l1.8 4.5 4.2.6-3.2 2.9.7 4L7 11z" fill="#F59E0B" stroke="#F59E0B" stroke-width="0.8"/></svg>
+            467
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5 - 关注的用户 -->
+    <div class="card">
+      <div class="card__body">
+        <div class="feed-card__meta">
+          <div class="avatar avatar--sm" style="background:linear-gradient(135deg,#EC4899,#BE185D);color:white;">海</div>
+          <span class="avatar-name">海边日记</span>
+          <span class="follow-badge">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5.5 1L6.9 4.2l3.1.3-2.3 2 .6 3L5.5 8 2.7 9.5l.6-3-2.3-2 3.1-.3L5.5 1z" fill="#534AB7"/></svg>
+            已关注
+          </span>
+          <span class="avatar-time">3小时前</span>
+        </div>
+        <div class="feed-card__title">日落时分的海岸线</div>
+        <div class="feed-card__desc">在厦门的海边等了三个傍晚，终于拍到满意的日落剪影。这一刻的海与天，橙红与深蓝的交界，像极了莫奈的画。</div>
+        <div class="feed-card__tags">
+          <span class="tag tag--default">摄影</span>
+          <span class="tag tag--green">已实现</span>
+        </div>
+        <div class="feed-card__stats">
+          <span class="feed-card__stat">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2.5C3.5 2.5 1 5.8 1 7c0 1.2 2.5 4.5 6 4.5s6-3.3 6-4.5c0-1.2-2.5-4.5-6-4.5z" stroke="#999" stroke-width="1.3"/><circle cx="7" cy="7" r="2" stroke="#999" stroke-width="1.3"/></svg>
+            3.4k
+          </span>
+          <span class="feed-card__stat">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12 9.5c0 .8-.7 1.5-1.5 1.5h-7C2.7 11 2 10.3 2 9.5V4c0-.3.2-.5.5-.5h9c.3 0 .5.2.5.5v5.5z" stroke="#999" stroke-width="1.3"/><line x1="5" y1="6" x2="9" y2="6" stroke="#999" stroke-width="1" stroke-linecap="round"/><line x1="5" y1="8" x2="7.5" y2="8" stroke="#999" stroke-width="1" stroke-linecap="round"/></svg>
+            156
+          </span>
+          <span class="feed-card__stat" style="flex:1;text-align:right;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L8.8 5.2 13 5.8l-3 2.9.7 4.3L7 11l-3.7 2 .7-4.3-3-2.9 4.2-.6L7 1z" stroke="#999" stroke-width="1.3"/></svg>
+            729
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TabBar -->
+<div class="tabbar">
+  <div class="tabbar__item">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 10l8-7.5L19 10v8.5c0 .55-.45 1-1 1h-4v-6h-6v6H4c-.55 0-1-.45-1-1V10z" fill="currentColor"/></svg>
+    <span>首页</span>
+  </div>
+  <div class="tabbar__item tabbar__item--active">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 19l-1.45-1.32C5.4 14.36 2 11.71 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.21-3.4 5.86-7.55 9.18L11 19z" fill="currentColor"/></svg>
+    <span>关注</span>
+  </div>
+  <div class="tabbar__item tabbar__item--publish" style="color:var(--text-tertiary);">
+    <div class="tabbar__publish-btn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
+    </div>
+    <span>发布</span>
+  </div>
+  <div class="tabbar__item">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M17 16H5c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v7c0 1.1-.9 2-2 2z" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="8.5" r="1.3" fill="currentColor"/></svg>
+    <span>消息</span>
+  </div>
+  <div class="tabbar__item">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M3 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <span>我的</span>
+  </div>
+</div>
+
+</body>
+</html>

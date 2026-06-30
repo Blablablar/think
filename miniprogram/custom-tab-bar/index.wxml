@@ -4,7 +4,7 @@
   <view
     wx:for="{{list}}"
     wx:key="index"
-    class="tab-item {{active === index ? 'active' : ''}} {{index === 2 ? 'center-slot' : ''}}"
+    class="tab-item {{active === index ? 'tab-item--active' : ''}} {{index === 2 ? 'center-slot' : ''}}"
     bindtap="switchTab"
     data-index="{{index}}"
   >

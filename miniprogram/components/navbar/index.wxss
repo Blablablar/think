@@ -1,0 +1,153 @@
+/* components/navbar/index.wxss */
+
+/* 导航栏容器 */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+/* 导航栏内容 */
+.navbar__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;      /* 44px */
+  padding: 0 32rpx;   /* 16px */
+  position: relative;
+}
+
+/* 左侧区域 */
+.navbar__left {
+  position: absolute;
+  left: 32rpx;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* 返回按钮 */
+.navbar__back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64rpx;
+  height: 64rpx;
+  margin-left: -16rpx;
+}
+
+.navbar__back-icon {
+  font-size: 40rpx;
+}
+
+/* 标题 */
+.navbar__title {
+  font-size: 34rpx;    /* 17px */
+  font-weight: 600;
+  text-align: center;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 右侧区域 */
+.navbar__right {
+  position: absolute;
+  right: 32rpx;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.navbar__right-text {
+  font-size: 28rpx;    /* 14px */
+  font-weight: 500;
+}
+
+/* 搜索框 */
+.navbar__search {
+  display: flex;
+  align-items: center;
+  height: 72rpx;      /* 36px */
+  padding: 0 24rpx;   /* 12px */
+  background: rgba(247, 248, 250, 0.9);
+  border-radius: 36rpx;
+  flex: 1;
+  margin: 0 80rpx;   /* 左右留出空间给可能的前置/后置元素 */
+}
+
+.navbar__search-icon {
+  margin-right: 8rpx;
+  font-size: 28rpx;
+}
+
+.navbar__search-text {
+  font-size: 28rpx;    /* 14px */
+  color: #CCCCCC;
+}
+
+/* ============================================
+   导航栏类型样式
+   ============================================ */
+
+/* 紫色底 */
+.navbar--purple {
+  background: linear-gradient(135deg, #534AB7 0%, #42389E 100%);
+}
+
+.navbar--purple .navbar__title {
+  color: #FFFFFF;
+}
+
+.navbar--purple .navbar__back-icon {
+  color: #FFFFFF;
+}
+
+.navbar--purple .navbar__right-text {
+  color: #FFFFFF;
+}
+
+/* 白色底 */
+.navbar--white {
+  background: #FFFFFF;
+  border-bottom: 2rpx solid #E8E8E8;
+}
+
+.navbar--white .navbar__title {
+  color: #1A1A1A;
+}
+
+.navbar--white .navbar__back-icon {
+  color: #1A1A1A;
+}
+
+.navbar--white .navbar__right-text {
+  color: #534AB7;
+}
+
+/* 透明沉浸式 */
+.navbar--transparent {
+  background: transparent;
+}
+
+.navbar--transparent .navbar__title {
+  color: #1A1A1A;
+}
+
+.navbar--transparent .navbar__back-icon {
+  color: #1A1A1A;
+}
+
+.navbar--transparent .navbar__right-text {
+  color: #534AB7;
+}
+
+/* 占位元素 */
+.navbar__placeholder {
+  width: 100%;
+}

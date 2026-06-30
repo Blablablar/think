@@ -1,6 +1,6 @@
 {
-  "navigationBarTitleText": "发布创意",
   "usingComponents": {
-    "tag-selector": "/components/tag-selector/index"
-  }
+    "navbar": "/components/navbar/index"
+  },
+  "navigationStyle": "custom"
 }

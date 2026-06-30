@@ -1,0 +1,41 @@
+<!-- components/navbar/index.wxml -->
+<view class="navbar navbar--{{type}}" style="padding-top: {{statusBarHeight}}px;">
+  <!-- 状态栏占位 -->
+  <view class="navbar__status-bar" style="height: {{statusBarHeight}}px;"></view>
+
+  <!-- 导航栏内容 -->
+  <view class="navbar__content">
+    <!-- 左侧区域 -->
+    <view class="navbar__left">
+      <view wx:if="{{showBack}}" class="navbar__back" bindtap="onBack">
+        <text class="navbar__back-icon">←</text>
+      </view>
+      <slot name="left"></slot>
+    </view>
+
+    <!-- 中间区域：标题或搜索框 -->
+    <block wx:if="{{showSearch}}">
+      <view class="navbar__search">
+        <text class="navbar__search-icon">🔍</text>
+        <text class="navbar__search-text">{{searchPlaceholder}}</text>
+      </view>
+    </block>
+    <block wx:else>
+      <!-- 标题 -->
+      <view class="navbar__title">
+        <text>{{title}}</text>
+      </view>
+    </block>
+
+    <!-- 右侧区域 -->
+    <view class="navbar__right">
+      <view wx:if="{{rightText}}" class="navbar__right-text" bindtap="onRightClick">
+        <text>{{rightText}}</text>
+      </view>
+      <slot name="right"></slot>
+    </view>
+  </view>
+</view>
+
+<!-- 导航栏占位（防止内容被导航栏遮挡） -->
+<view class="navbar__placeholder" style="height: {{navBarHeight}}px;"></view>

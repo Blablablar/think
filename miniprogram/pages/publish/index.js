@@ -9,7 +9,9 @@ Page({
     images: [],
     selectedTags: [],
     publishing: false,
-    maxContent: MAX_CONTENT_LENGTH
+    maxContent: MAX_CONTENT_LENGTH,
+    showDraftTip: false,
+    tagOptions: ['插画', '摄影', '写作', '音乐', '手工', '生活', '设计', '视频']
   },
 
   onLoad() {
@@ -19,13 +21,19 @@ Page({
       this.setData({
         content: draft.content || '',
         images: draft.images || [],
-        selectedTags: draft.tags || []
+        selectedTags: draft.tags || [],
+        showDraftTip: true
       })
+      // 3秒后隐藏草稿提示
+      setTimeout(() => {
+        this.setData({ showDraftTip: false })
+      }, 3000)
     }
   },
 
   onContentInput(e) {
     this.setData({ content: e.detail.value.slice(0, MAX_CONTENT_LENGTH) })
+    this.autoSaveDraft()
   },
 
   async onChooseImage() {
@@ -44,6 +52,7 @@ Page({
       this.setData({
         images: [...this.data.images, ...compressedImages].slice(0, 9)
       })
+      this.autoSaveDraft()
     } catch (err) {
       console.error('[Publish] chooseImage failed:', err)
     }
@@ -53,14 +62,59 @@ Page({
     const idx = e.currentTarget.dataset.index
     const images = this.data.images.filter((_, i) => i !== idx)
     this.setData({ images })
+    this.autoSaveDraft()
   },
 
-  onTagsChange(e) {
-    this.setData({ selectedTags: e.detail.tags })
+  onToggleTag(e) {
+    const tag = e.currentTarget.dataset.tag
+    let selectedTags = [...this.data.selectedTags]
+
+    const index = selectedTags.indexOf(tag)
+    if (index > -1) {
+      selectedTags.splice(index, 1)
+    } else {
+      selectedTags.push(tag)
+    }
+
+    this.setData({ selectedTags })
+    this.autoSaveDraft()
   },
 
-  onVoiceClick() {
-    showToast('语音功能开发中')
+  onCancel() {
+    // 如果有内容，提示是否保存草稿
+    if (this.data.content.trim() || this.data.images.length > 0) {
+      wx.showModal({
+        title: '提示',
+        content: '是否保存草稿？',
+        confirmText: '保存',
+        cancelText: '不保存',
+        success: (res) => {
+          if (res.confirm) {
+            this.saveDraft()
+          }
+          wx.navigateBack()
+        }
+      })
+    } else {
+      wx.navigateBack()
+    }
+  },
+
+  // 自动保存草稿
+  autoSaveDraft() {
+    const { content, images, selectedTags } = this.data
+    wx.setStorageSync('publish_draft', { content, images, tags: selectedTags })
+  },
+
+  // 手动保存草稿
+  saveDraft() {
+    const { content, images, selectedTags } = this.data
+    wx.setStorageSync('publish_draft', { content, images, tags: selectedTags })
+    this.setData({ showDraftTip: true })
+    setTimeout(() => {
+      this.setData({ showDraftTip: false })
+    }, 3000)
+    showToast('草稿已保存', 'success')
   },
 
   // 上传单张图片到云存储
@@ -117,7 +171,7 @@ Page({
       this.setData({ content: '', images: [], selectedTags: [] })
       wx.removeStorageSync('publish_draft')
       setTimeout(() => {
-        wx.switchTab({ url: '/pages/today/index' })
+        wx.switchTab({ url: '/pages/home/home' })
       }, 1500)
     } catch (err) {
       hideLoading()
@@ -126,11 +180,5 @@ Page({
     } finally {
       this.setData({ publishing: false })
     }
-  },
-
-  onSaveDraft() {
-    const { content, images, selectedTags } = this.data
-    wx.setStorageSync('publish_draft', { content, images, tags: selectedTags })
-    showToast('草稿已保存', 'success')
   }
 })

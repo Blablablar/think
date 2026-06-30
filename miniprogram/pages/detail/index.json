@@ -1,7 +1,6 @@
 {
-  "navigationBarTitleText": "创意详情",
   "usingComponents": {
-    "creativity-card": "/components/creativity-card/index",
-    "empty-state": "/components/empty-state/index"
-  }
+    "navbar": "/components/navbar/index"
+  },
+  "navigationStyle": "custom"
 }
