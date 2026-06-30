@@ -1,6 +1,60 @@
+<!-- pages/user/index.wxml -->
 <view class="page">
-  <view class="icon">👤</view>
-  <view class="title">用户主页</view>
-  <view class="sub-text">功能正在开发中...</view>
-  <view class="bottom-spacer"></view>
+  <!-- 顶部资料卡 -->
+  <view class="profile-card" wx:if="{{userInfo}}">
+    <view class="profile-row">
+      <image wx:if="{{userInfo.avatarUrl}}" class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      <view wx:else class="avatar avatar-default">👤</view>
+      <view class="profile-info">
+        <view class="nickname ellipsis">{{userInfo.nickName || '微信用户'}}</view>
+        <view class="join-date" wx:if="{{userInfo.joinDate}}">加入于 {{userInfo.joinDate}}</view>
+      </view>
+    </view>
+    <view class="stats-row">
+      <view class="stat-item">
+        <view class="stat-num">{{userInfo.creativityCount || 0}}</view>
+        <view class="stat-label">创意</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-num">{{userInfo.followerCount || 0}}</view>
+        <view class="stat-label">粉丝</view>
+      </view>
+    </view>
+    <button
+      wx:if="{{!isSelf}}"
+      class="follow-btn {{userInfo.isFollowing ? 'followed' : ''}}"
+      bindtap="onToggleFollow"
+    >{{userInfo.isFollowing ? '已关注' : '+ 关注'}}</button>
+  </view>
+
+  <!-- 创意列表 -->
+  <scroll-view
+    scroll-y
+    class="list"
+    bindscrolltolower="onReachBottom"
+    refresher-enabled
+    refresher-triggered="{{refreshing}}"
+    bindrefresherrefresh="onPullDownRefresh"
+  >
+    <block wx:if="{{list.length > 0}}">
+      <creativity-card
+        wx:for="{{list}}"
+        wx:key="_id"
+        data="{{item}}"
+        show-author="{{false}}"
+        bind:click="onCardClick"
+        bind:like="onLike"
+        bind:dislike="onDislike"
+        bind:tagclick="onTagClick"
+      ></creativity-card>
+      <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
+      <view class="loading-tip" wx:if="{{!hasMore && list.length > 0}}">没有更多了</view>
+    </block>
+
+    <empty-state
+      wx:if="{{list.length === 0 && !loading}}"
+      icon="📭"
+      text="TA还没有发布创意"
+    ></empty-state>
+  </scroll-view>
 </view>

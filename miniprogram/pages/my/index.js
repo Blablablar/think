@@ -222,10 +222,6 @@ Page({
     })
   },
 
-  onEditProfile() {
-    showToast('编辑资料功能开发中')
-  },
-
   onMsgClick() {
     wx.navigateTo({ url: '/pages/messages/index' })
   },

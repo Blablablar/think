@@ -1,6 +1,43 @@
+<!-- pages/messages/index.wxml -->
 <view class="page">
-  <view class="icon">📬</view>
-  <view class="title">消息中心</view>
-  <view class="sub-text">功能正在开发中...</view>
-  <view class="bottom-spacer"></view>
+  <view class="header">
+    <text class="header-title">消息通知</text>
+    <text class="mark-all" bindtap="onMarkAllRead">全部已读</text>
+  </view>
+
+  <scroll-view
+    scroll-y
+    class="list"
+    bindscrolltolower="onReachBottom"
+    refresher-enabled
+    refresher-triggered="{{refreshing}}"
+    bindrefresherrefresh="onPullDownRefresh"
+  >
+    <block wx:if="{{list.length > 0}}">
+      <view
+        class="msg-item {{item.isRead ? '' : 'unread'}}"
+        wx:for="{{list}}"
+        wx:key="_id"
+        bindtap="onItemClick"
+        data-id="{{item._id}}"
+        data-creativityid="{{item.creativityId}}"
+        data-type="{{item.type}}"
+      >
+        <view class="msg-icon">{{item.icon}}</view>
+        <view class="msg-body">
+          <view class="msg-text">{{item.text}}</view>
+          <view class="msg-time">{{item.date}}</view>
+        </view>
+        <view class="dot" wx:if="{{!item.isRead}}"></view>
+      </view>
+      <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
+      <view class="loading-tip" wx:if="{{!hasMore && list.length > 0}}">没有更多了</view>
+    </block>
+
+    <empty-state
+      wx:if="{{list.length === 0 && !loading}}"
+      icon="🔔"
+      text="暂无消息通知"
+    ></empty-state>
+  </scroll-view>
 </view>

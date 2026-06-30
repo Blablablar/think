@@ -35,7 +35,6 @@
       <view class="login-avatar">👤</view>
       <view class="login-tip">登录后查看你的创意世界</view>
       <button class="login-btn" bindtap="onLogin">
-        <text class="login-icon">💚</text>
         <text>微信一键登录</text>
       </button>
     </view>

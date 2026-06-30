@@ -103,10 +103,6 @@
   border: none;
 }
 
-.login-icon {
-  font-size: 32rpx;
-}
-
 .avatar {
   width: 128rpx;
   height: 128rpx;
