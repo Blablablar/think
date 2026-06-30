@@ -23,13 +23,13 @@ exports.main = async (event, context) => {
 
       // 查询当前用户的点赞/点踩记录
       const myLikeRes = await userLikesCol.where({
-        _openid: OPENID,
+        openid: OPENID,
         creativityId: creativityId,
         type: 'like'
       }).get()
 
       const myDislikeRes = await userLikesCol.where({
-        _openid: OPENID,
+        openid: OPENID,
         creativityId: creativityId,
         type: 'dislike'
       }).get()
@@ -49,6 +49,7 @@ exports.main = async (event, context) => {
           await userLikesCol.add({
             data: {
               _openid: OPENID,
+              openid: OPENID,
               creativityId: creativityId,
               type: 'like',
               createdAt: db.serverDate()
@@ -78,6 +79,7 @@ exports.main = async (event, context) => {
           await userLikesCol.add({
             data: {
               _openid: OPENID,
+              openid: OPENID,
               creativityId: creativityId,
               type: 'dislike',
               createdAt: db.serverDate()
@@ -98,12 +100,12 @@ exports.main = async (event, context) => {
 
       // 重新查询最终状态
       const finalLikeRes = await userLikesCol.where({
-        _openid: OPENID,
+        openid: OPENID,
         creativityId: creativityId,
         type: 'like'
       }).get()
       const finalDislikeRes = await userLikesCol.where({
-        _openid: OPENID,
+        openid: OPENID,
         creativityId: creativityId,
         type: 'dislike'
       }).get()

@@ -6,24 +6,26 @@
   left: 0;
   right: 0;
   height: 100rpx;
+  padding-bottom: env(safe-area-inset-bottom);
   background: #ffffff;
+  border-top: 1rpx solid #f0f0f0;
   display: flex;
   align-items: center;
+  justify-content: space-around;
   z-index: 999;
-  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
-  /* 为 iPhone X 等留出底部安全区 */
-  padding-bottom: env(safe-area-inset-bottom);
   box-sizing: content-box;
 }
 
 .tab-item {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 4rpx;
   height: 100rpx;
+  min-width: 96rpx;
   position: relative;
+  color: #999999;
 }
 
 .center-slot {
@@ -31,44 +33,57 @@
 }
 
 .tab-icon {
-  font-size: 40rpx;
-  margin-bottom: 4rpx;
-  color: #b2bec3;
+  width: 44rpx;
+  height: 44rpx;
   line-height: 1;
 }
 
 .tab-text {
   font-size: 20rpx;
-  color: #b2bec3;
+  color: #999999;
+  line-height: 1;
 }
 
-.tab-item--active .tab-icon,
+.tab-item--active {
+  color: #534ab7;
+}
+
 .tab-item--active .tab-text {
   color: #534ab7;
 }
 
-/* 中央凸起按钮 - 绝对定位居中 */
+/* 中央凸起按钮 - 与设计稿一致：48x48 圆形，紫色渐变，向上凸起 */
 .center-btn {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  top: -40rpx;
-  width: 112rpx;
-  height: 112rpx;
+  top: -24rpx;
+  width: 96rpx;
+  height: 96rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #534ab7 0%, #7c6ef6 100%);
+  background: linear-gradient(135deg, #534ab7 0%, #42389e 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8rpx 24rpx rgba(83, 74, 183, 0.4);
+  box-shadow: 0 8rpx 32rpx rgba(83, 74, 183, 0.35);
   z-index: 10;
 }
 
-.center-plus {
-  font-size: 64rpx;
-  color: #ffffff;
-  font-weight: 300;
-  line-height: 1;
-  /* 微调加号视觉居中 */
-  margin-top: -6rpx;
+/* 加号用伪元素绘制，与高保真 SVG 一致 */
+.center-btn::before,
+.center-btn::after {
+  content: '';
+  position: absolute;
+  background: #ffffff;
+  border-radius: 2rpx;
+}
+
+.center-btn::before {
+  width: 4.4rpx;
+  height: 30.8rpx;
+}
+
+.center-btn::after {
+  width: 30.8rpx;
+  height: 4.4rpx;
 }

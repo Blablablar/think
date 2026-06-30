@@ -21,7 +21,7 @@ exports.main = async (event, context) => {
       return { code: -1, message: '认领记录不存在', data: null }
     }
 
-    if (claim._openid !== OPENID) {
+    if ((claim.openid || claim._openid) !== OPENID) {
       return { code: -1, message: '无权操作此认领记录', data: null }
     }
 

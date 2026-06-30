@@ -1,6 +1,5 @@
 <!-- custom-tab-bar/index.wxml -->
 <view class="tab-bar">
-  <!-- 5个 tab 等分布局，中间 publish 项占位（不显示文字） -->
   <view
     wx:for="{{list}}"
     wx:key="index"
@@ -8,15 +7,12 @@
     bindtap="switchTab"
     data-index="{{index}}"
   >
-    <!-- 中间位置留空，由绝对定位的按钮覆盖 -->
     <block wx:if="{{index !== 2}}">
-      <view class="tab-icon">{{item.icon}}</view>
+      <image class="tab-icon" src="{{active === index ? item.iconActive : item.icon}}"></image>
       <view class="tab-text">{{item.text}}</view>
     </block>
   </view>
 
-  <!-- 中央凸起的发布按钮（绝对定位居中） -->
-  <view class="center-btn" bindtap="switchTab" data-index="2">
-    <view class="center-plus">+</view>
-  </view>
+  <!-- 中央凸起的发布按钮 -->
+  <view class="center-btn" bindtap="switchTab" data-index="2"></view>
 </view>

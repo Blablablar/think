@@ -11,7 +11,7 @@ exports.main = async (event, context) => {
     const notifications = db.collection('notifications')
 
     const countRes = await notifications.where({
-      _openid: OPENID,
+      openid: OPENID,
       isRead: false
     }).count()
 

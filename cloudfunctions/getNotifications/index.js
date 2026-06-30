@@ -12,10 +12,10 @@ exports.main = async (event, context) => {
 
     const notifications = db.collection('notifications')
 
-    const countRes = await notifications.where({ _openid: OPENID }).count()
+    const countRes = await notifications.where({ openid: OPENID }).count()
     const total = countRes.total
 
-    const listRes = await notifications.where({ _openid: OPENID })
+    const listRes = await notifications.where({ openid: OPENID })
       .orderBy('createdAt', 'desc')
       .skip(skip)
       .limit(pageSize)

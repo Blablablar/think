@@ -9,33 +9,86 @@
 
 .content {
   flex: 1;
-  padding: 24rpx 32rpx;
-  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
-  height: calc(100vh - 200rpx);
+  padding: 32rpx;
+  padding-bottom: calc(320rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
-/* 正文输入区 */
-.input-area {
-  background: #f5f5f5;
-  border-radius: 0;
-  padding: 32rpx 0;
-  margin-bottom: 32rpx;
+/* ============================================
+   字段 - .field
+   ============================================ */
+.field {
+  margin-bottom: 48rpx;       /* space-6 24px */
 }
 
-.text-input {
-  width: 100%;
-  min-height: 300rpx;
-  font-size: 32rpx;
-  line-height: 1.8;
-  color: #1a1a2e;
-  background: transparent;
-  padding: 0;
+.field__label {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;                 /* space-2 8px */
+  font-size: 28rpx;           /* text-md 14px */
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 24rpx;       /* space-3 12px */
+}
+
+.field__dot {
+  width: 12rpx;               /* 6px */
+  height: 12rpx;
+  border-radius: 50%;
+  background: #534ab7;
+  flex-shrink: 0;
+}
+
+.field__hint {
+  font-size: 24rpx;           /* text-sm 12px */
+  color: #999999;
+  margin-top: 16rpx;          /* space-2 8px */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.field__hint--right {
+  justify-content: flex-end;
 }
 
 .placeholder {
-  color: #b2bec3;
-  font-size: 32rpx;
+  color: #cccccc;
+}
+
+/* ============================================
+   标题输入 - .input-ghost--title
+   ============================================ */
+.title-input {
+  width: 100%;
+  height: 88rpx;              /* 44px */
+  padding: 0 32rpx;           /* space-4 16px */
+  background: #f7f8fa;        /* bg-input */
+  border-radius: 16rpx;       /* radius-md 8px */
+  font-size: 30rpx;           /* text-base 15px */
+  font-weight: 600;
+  color: #1a1a1a;
+  box-sizing: border-box;
+}
+
+/* ============================================
+   正文编辑器 - .content-editor
+   ============================================ */
+.editor {
+  background: #f7f8fa;        /* bg-input */
+  border-radius: 16rpx;       /* radius-md 8px */
+  padding: 32rpx;             /* space-4 16px */
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;                 /* space-3 12px */
+}
+
+.editor__input {
+  width: 100%;
+  min-height: 240rpx;
+  font-size: 30rpx;           /* text-base 15px */
+  line-height: 1.6;           /* leading-relaxed */
+  color: #1a1a1a;
 }
 
 /* 已插入图片 */
@@ -43,14 +96,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: 16rpx;
-  margin-top: 32rpx;
 }
 
 .image-item {
   position: relative;
-  width: 200rpx;
-  height: 200rpx;
-  border-radius: 12rpx;
+  width: 100%;
+  height: 320rpx;             /* 16:10 比例 */
+  border-radius: 16rpx;
   overflow: hidden;
 }
 
@@ -59,20 +111,11 @@
   height: 100%;
 }
 
-.image-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(180deg, rgba(83, 74, 183, 0.1) 0%, transparent 100%);
-}
-
 .image-delete {
   position: absolute;
-  top: 8rpx;
-  right: 8rpx;
-  width: 48rpx;
+  top: 16rpx;
+  right: 16rpx;
+  width: 48rpx;               /* 24px */
   height: 48rpx;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.5);
@@ -83,119 +126,77 @@
   font-size: 24rpx;
 }
 
-/* 插入图片入口 */
-.add-image-btn {
-  width: 200rpx;
-  height: 200rpx;
-  border-radius: 12rpx;
-  border: 2rpx dashed #d1d5db;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #ffffff;
-}
-
-.add-icon {
-  font-size: 48rpx;
-  color: #6c5ce7;
-  margin-bottom: 8rpx;
-}
-
-.add-text {
-  font-size: 22rpx;
-  color: #6c5ce7;
-}
-
-/* 无图片时的插入图片入口 */
-.insert-image {
+/* 插入图片入口 - .inline-add */
+.inline-add {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 48rpx;
-  padding: 32rpx 0;
+  gap: 8rpx;                  /* space-1 4px */
+  height: 80rpx;              /* 40px */
+  border-radius: 16rpx;
+  border: 2rpx dashed #e8e8e8;
+  background: transparent;
+  color: #999999;
+  font-size: 24rpx;           /* text-sm 12px */
 }
 
-.insert-line {
-  flex: 1;
-  height: 2rpx;
-  background: #e5e6eb;
+.inline-add__icon {
+  font-size: 32rpx;
 }
 
-.insert-text {
-  padding: 0 24rpx;
-  font-size: 24rpx;
-  color: #6c5ce7;
-}
-
-/* 分类标签选择 */
-.tag-section {
-  margin-bottom: 32rpx;
-}
-
-.tag-list {
+/* ============================================
+   分类标签 - .tag-grid / .tag-pill
+   ============================================ */
+.tag-grid {
   display: flex;
-  gap: 16rpx;
-  overflow-x: auto;
-  white-space: nowrap;
-  padding: 8rpx 0;
+  flex-wrap: wrap;
+  gap: 16rpx;                 /* space-2 8px */
 }
 
-.tag-list::-webkit-scrollbar {
-  display: none;
-}
-
-.tag-item {
+.tag-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 56rpx;
-  padding: 0 28rpx;
-  border-radius: 28rpx;
-  background: #f2f3f5;
-  color: #636e72;
-  font-size: 24rpx;
-  flex-shrink: 0;
+  height: 56rpx;              /* 28px */
+  padding: 0 24rpx;           /* space-3 12px */
+  border-radius: 28rpx;       /* 14px */
+  font-size: 24rpx;           /* text-sm 12px */
+  background: #f0eff5;        /* bg-tag */
+  color: #666666;             /* text-secondary */
 }
 
-.tag-item--active {
-  background: rgba(108, 92, 231, 0.1);
-  color: #534ab7;
+.tag-pill--selected {
+  background: #f5f3ff;        /* brand-purple-50 */
+  color: #534ab7;             /* brand-purple-500 */
   font-weight: 500;
 }
 
-/* 草稿提示 */
-.draft-tip {
-  text-align: center;
-  padding: 24rpx 0;
-  font-size: 22rpx;
-  color: #b2bec3;
-}
-
-/* 底部发布按钮 */
+/* ============================================
+   底部发布按钮 - .publish-bottom
+   ============================================ */
 .bottom-bar {
   position: fixed;
-  bottom: 0;
+  bottom: calc(100rpx + env(safe-area-inset-bottom));
   left: 0;
   right: 0;
-  padding: 24rpx 32rpx;
-  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  padding: 24rpx 32rpx;       /* space-3 space-4 */
   background: #ffffff;
-  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.05);
+  border-top: 1rpx solid #f0f0f0;
   z-index: 100;
 }
 
 .publish-btn {
   width: 100%;
-  height: 92rpx;
+  height: 92rpx;              /* 46px */
   background: #534ab7;
   color: #ffffff;
-  font-size: 32rpx;
+  font-size: 30rpx;           /* text-base 15px */
   font-weight: 600;
-  border-radius: 0;
+  border-radius: 24rpx;       /* radius-lg 12px */
   border: none;
   line-height: 92rpx;
   padding: 0;
+  letter-spacing: 1rpx;
 }
 
 .publish-btn::after {
@@ -203,5 +204,9 @@
 }
 
 .publish-btn[loading] {
+  opacity: 0.7;
+}
+
+.publish-btn[disabled] {
   opacity: 0.7;
 }

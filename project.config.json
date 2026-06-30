@@ -45,7 +45,7 @@
     "disableSWC": true
   },
   "compileType": "miniprogram",
-  "libVersion": "3.1.0",
+  "libVersion": "3.13.2",
   "appid": "wx4690eaf9a8d52607",
   "projectname": "lighght",
   "condition": {},

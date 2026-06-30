@@ -39,6 +39,7 @@ exports.main = async (event, context) => {
       await notifications.add({
         data: {
           _openid: targetOpenid,
+          openid: targetOpenid,
           type: 'follow',
           fromOpenid: OPENID,
           isRead: false,

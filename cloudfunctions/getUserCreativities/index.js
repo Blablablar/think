@@ -16,7 +16,7 @@ exports.main = async (event, context) => {
   try {
     // 查询目标用户的创意总数
     const countRes = await db.collection('creativities').where({
-      _openid: openid
+      openid: openid
     }).count()
     const total = countRes.total
 
@@ -28,7 +28,7 @@ exports.main = async (event, context) => {
 
     // 分页查询 creativities（按 createdAt 降序）
     const creativitiesRes = await db.collection('creativities')
-      .where({ _openid: openid })
+      .where({ openid: openid })
       .orderBy('createdAt', 'desc')
       .skip(skip)
       .limit(pageSize)
@@ -42,15 +42,15 @@ exports.main = async (event, context) => {
     // lookup users 作者信息
     let usersMap = {}
     const usersRes = await db.collection('users').where({
-      _openid: openid
+      openid: openid
     }).get()
     usersRes.data.forEach(item => {
-      usersMap[item._openid] = item
+      usersMap[item.openid] = item
     })
 
     const resultList = list.map(item => ({
       ...item,
-      author: usersMap[item._openid] || null
+      author: usersMap[item.openid || item._openid] || null
     }))
 
     const hasMore = skip + resultList.length < total

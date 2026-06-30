@@ -1,4 +1,10 @@
 // components/navbar/index.js
+const P = 'data:image/svg+xml;base64,'
+// 返回箭头 SVG（默认白色，用于紫色导航栏）
+const BACK_ICON_WHITE = P + 'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBkPSJNMjAgMTZIOE04IDE2bDUtNU04IDE2bDUgNSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIi8+PC9zdmc+'
+// 返回箭头 SVG（深色，用于白色/透明导航栏）
+const BACK_ICON_DARK = P + 'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBkPSJNMjAgMTZIOE04IDE2bDUtNU04IDE2bDUgNSIgc3Ryb2tlPSIjMWExYTFhIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIi8+PC9zdmc+'
+
 Component({
   /**
    * 组件的属性列表
@@ -12,7 +18,7 @@ Component({
     // 导航栏类型：purple（紫色底）、white（白色底）、transparent（透明沉浸式）
     type: {
       type: String,
-      value: 'purple'  // 默认值：紫色底
+      value: 'purple'
     },
     // 是否显示返回按钮
     showBack: {
@@ -23,16 +29,6 @@ Component({
     rightText: {
       type: String,
       value: ''
-    },
-    // 是否显示搜索框（替换标题）
-    showSearch: {
-      type: Boolean,
-      value: false
-    },
-    // 搜索框占位文字
-    searchPlaceholder: {
-      type: String,
-      value: '搜索灵感...'
     }
   },
 
@@ -40,8 +36,9 @@ Component({
    * 组件的初始数据
    */
   data: {
-    statusBarHeight: 0,  // 状态栏高度
-    navBarHeight: 0        // 导航栏总高度（状态栏 + 导航栏内容）
+    statusBarHeight: 0,
+    navBarHeight: 0,
+    backIcon: BACK_ICON_WHITE
   },
 
   /**
@@ -49,15 +46,18 @@ Component({
    */
   lifetimes: {
     attached() {
-      // 获取系统信息
-      const systemInfo = wx.getSystemInfoSync();
-      const statusBarHeight = systemInfo.statusBarHeight;
-      const navBarHeight = statusBarHeight + 44;  // 状态栏高度 + 导航栏内容高度（44px）
+      const winInfo = wx.getWindowInfo()
+      const statusBarHeight = winInfo.statusBarHeight
+      const navBarHeight = statusBarHeight + 44
+
+      // 根据导航栏类型选择返回箭头颜色
+      const backIcon = this.data.type === 'purple' ? BACK_ICON_WHITE : BACK_ICON_DARK
 
       this.setData({
         statusBarHeight,
-        navBarHeight
-      });
+        navBarHeight,
+        backIcon
+      })
     }
   },
 
@@ -67,22 +67,19 @@ Component({
   methods: {
     // 返回按钮点击
     onBack() {
-      this.triggerEvent('back');
-
-      // 默认行为：返回上一页
+      this.triggerEvent('back')
       wx.navigateBack({
         fail() {
-          // 如果没有上一页，则跳转到首页
           wx.switchTab({
             url: '/pages/home/home'
-          });
+          })
         }
-      });
+      })
     },
 
     // 右侧按钮点击
     onRightClick() {
-      this.triggerEvent('rightclick');
+      this.triggerEvent('rightclick')
     }
   }
-});
+})

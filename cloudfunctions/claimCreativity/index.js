@@ -15,7 +15,7 @@ exports.main = async (event, context) => {
   try {
     // 检查是否已认领
     const existRes = await db.collection('claims').where({
-      _openid: OPENID,
+      openid: OPENID,
       creativityId,
       status: 'active'
     }).get()
@@ -33,6 +33,7 @@ exports.main = async (event, context) => {
     const claimRes = await db.collection('claims').add({
       data: {
         _openid: OPENID,
+        openid: OPENID,
         creativityId,
         status: 'active',
         claimedAt: now,
@@ -48,10 +49,11 @@ exports.main = async (event, context) => {
     })
 
     // 通知创意作者
-    if (creativity && creativity._openid) {
+    if (creativity && (creativity.openid || creativity._openid)) {
       await db.collection('notifications').add({
         data: {
-          _openid: creativity._openid,
+          _openid: creativity.openid || creativity._openid,
+          openid: creativity.openid || creativity._openid,
           fromOpenid: OPENID,
           type: 'claim',
           creativityId,

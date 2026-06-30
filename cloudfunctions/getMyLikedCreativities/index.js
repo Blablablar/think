@@ -12,7 +12,7 @@ exports.main = async (event, context) => {
   try {
     // 查询当前用户点赞记录总数
     const countRes = await db.collection('userLikes').where({
-      _openid: OPENID,
+      openid: OPENID,
       type: 'like'
     }).count()
     const total = countRes.total
@@ -24,7 +24,7 @@ exports.main = async (event, context) => {
     // 分页查询 userLikes（按 createdAt 降序）
     const skip = (page - 1) * pageSize
     const likesRes = await db.collection('userLikes')
-      .where({ _openid: OPENID, type: 'like' })
+      .where({ openid: OPENID, type: 'like' })
       .orderBy('createdAt', 'desc')
       .skip(skip)
       .limit(pageSize)
@@ -48,14 +48,14 @@ exports.main = async (event, context) => {
     })
 
     // lookup users 作者信息
-    const authorOpenids = creativitiesRes.data.map(item => item._openid).filter(Boolean)
+    const authorOpenids = creativitiesRes.data.map(item => item.openid || item._openid).filter(Boolean)
     let usersMap = {}
     if (authorOpenids.length > 0) {
       const usersRes = await db.collection('users').where({
-        _openid: _.in(authorOpenids)
+        openid: _.in(authorOpenids)
       }).get()
       usersRes.data.forEach(item => {
-        usersMap[item._openid] = item
+        usersMap[item.openid] = item
       })
     }
 
@@ -63,7 +63,7 @@ exports.main = async (event, context) => {
     const list = likes.map(like => {
       const creativity = creativitiesMap[like.creativityId]
       if (!creativity) return null
-      const author = usersMap[creativity._openid] || null
+      const author = usersMap[creativity.openid || creativity._openid] || null
       return {
         ...creativity,
         author,

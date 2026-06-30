@@ -55,29 +55,30 @@ exports.main = async (event, context) => {
       repliesMap[item.parentId].push(item)
     })
 
-    // 收集所有评论作者 openid（一级 + 二级）
+    // 收集所有评论作者 openid（一级 + 二级），优先用 openid 字段
     const allComments = [...rootComments, ...replies]
-    const authorOpenids = allComments.map(item => item._openid).filter(Boolean)
+    const authorOpenids = allComments.map(item => item.openid || item._openid).filter(Boolean)
     let usersMap = {}
     if (authorOpenids.length > 0) {
       const uniqueOpenids = Array.from(new Set(authorOpenids))
       const usersRes = await db.collection('users').where({
-        _openid: _.in(uniqueOpenids)
+        openid: _.in(uniqueOpenids)
       }).get()
       usersRes.data.forEach(item => {
-        usersMap[item._openid] = item
+        usersMap[item.openid] = item
       })
     }
 
     // 组装最终结构：每条一级评论挂上其 replies
     const list = rootComments.map(comment => {
+      const commentOpenid = comment.openid || comment._openid
       const commentReplies = (repliesMap[comment._id] || []).slice(0, 100).map(reply => ({
         ...reply,
-        author: usersMap[reply._openid] || null
+        author: usersMap[reply.openid || reply._openid] || null
       }))
       return {
         ...comment,
-        author: usersMap[comment._openid] || null,
+        author: usersMap[commentOpenid] || null,
         replies: commentReplies
       }
     })

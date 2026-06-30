@@ -33,7 +33,8 @@ exports.main = async (event, context) => {
     const targetType = status === 'approved' ? 'video_approved' : 'video_rejected'
     await notifications.add({
       data: {
-        _openid: impl._openid,
+        _openid: impl.openid || impl._openid,
+        openid: impl.openid || impl._openid,
         type: targetType,
         implId: implId,
         isRead: false,

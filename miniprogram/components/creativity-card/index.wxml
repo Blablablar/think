@@ -1,78 +1,67 @@
 <!-- components/creativity-card/index.wxml -->
 <view class="card" bindtap="onCardClick">
-  <!-- 作者信息 -->
-  <view class="author">
-    <image wx:if="{{data.author.avatar}}" class="author__avatar" src="{{data.author.avatar}}" mode="aspectFill"></image>
-    <view wx:else class="author__avatar author__avatar--default">👤</view>
-    <text class="author__name ellipsis">{{data.author.name || '微信用户'}}</text>
-    <text class="author__time">{{data.createdAt}}</text>
+  <!-- 推荐理由标签 -->
+  <view wx:if="{{data.recommendReason}}" class="reason">
+    <text>{{data.recommendReason}}</text>
   </view>
 
-  <!-- 推荐理由标签 -->
-  <view wx:if="{{data.recommendReason}}" class="recommend-reason">
-    <text class="recommend-reason__text">{{data.recommendReason}}</text>
+  <!-- 作者信息 -->
+  <view class="meta">
+    <image wx:if="{{data.author.avatar}}" class="meta__avatar" src="{{data.author.avatar}}" mode="aspectFill"></image>
+    <view wx:else class="meta__avatar meta__avatar--default">👤</view>
+    <text class="meta__name">{{data.author.name || '微信用户'}}</text>
+    <text class="meta__time">{{data.createdAt}}</text>
   </view>
 
   <!-- 标题 -->
-  <view wx:if="{{data.title}}" class="title">
-    <text>{{data.title}}</text>
-  </view>
+  <view wx:if="{{data.title}}" class="title">{{data.title}}</view>
 
   <!-- 摘要 -->
-  <view wx:if="{{data.summary}}" class="summary ellipsis-2">
-    <text>{{data.summary}}</text>
-  </view>
+  <view wx:if="{{data.summary}}" class="desc">{{data.summary}}</view>
 
   <!-- 图片展示 -->
   <view wx:if="{{data.images.length > 0}}" class="images">
     <!-- 单图：全宽 -->
-    <block wx:if="{{data.images.length === 1}}">
-      <image
-        class="images__single"
-        src="{{data.images[0]}}"
-        mode="aspectFill"
-        lazy-load
-        bindtap="onPreviewImage"
-        data-index="0"
-      ></image>
-    </block>
+    <image
+      wx:if="{{data.images.length === 1}}"
+      class="images__single"
+      src="{{data.images[0]}}"
+      mode="aspectFill"
+      lazy-load
+      catchtap="onPreviewImage"
+      data-index="0"
+    ></image>
 
     <!-- 多图：横滑 -->
-    <block wx:else>
-      <scroll-view scroll-x class="images__multi-scroll">
-        <view class="images__multi-list">
-          <image
-            wx:for="{{data.images}}"
-            wx:key="*this"
-            class="images__multi-item"
-            src="{{item}}"
-            mode="aspectFill"
-            lazy-load
-            bindtap="onPreviewImage"
-            data-index="{{index}}"
-          ></image>
-        </view>
-      </scroll-view>
-    </block>
+    <scroll-view wx:else scroll-x class="images__scroll">
+      <view class="images__multi">
+        <image
+          wx:for="{{data.images}}"
+          wx:key="*this"
+          class="images__item"
+          src="{{item}}"
+          mode="aspectFill"
+          lazy-load
+          catchtap="onPreviewImage"
+          data-index="{{index}}"
+        ></image>
+      </view>
+    </scroll-view>
   </view>
 
   <!-- 底部互动栏 -->
-  <view class="footer">
-    <view class="footer__left">
-      <view class="footer__btn" catchtap="onLike">
-        <text class="footer__btn-icon">{{data.stats.likes > 0 ? '♡' : '♡'}}</text>
-        <text class="footer__btn-text">{{data.stats.likes || 0}}</text>
-      </view>
-      <view class="footer__btn" catchtap="onComment">
-        <text class="footer__btn-icon">💬</text>
-        <text class="footer__btn-text">{{data.stats.comments || 0}}</text>
-      </view>
+  <view class="stats">
+    <view class="stats__item" catchtap="onLike">
+      <image class="stats__icon" src="{{data.isLiked ? icons.heartActive : icons.heart}}"></image>
+      <text class="stats__text">{{data.stats.likes || 0}}</text>
     </view>
-
-    <view class="footer__right">
-      <view class="footer__fav {{data.isFavorited ? 'footer__fav--active' : ''}}" catchtap="onFavorite">
-        <text>{{data.isFavorited ? '★' : '☆'}}</text>
-      </view>
+    <view class="stats__item" catchtap="onComment">
+      <image class="stats__icon" src="{{icons.comment}}"></image>
+      <text class="stats__text">{{data.stats.comments || 0}}</text>
+    </view>
+    <view class="stats__item stats__item--right" catchtap="onFavorite">
+      <image class="stats__icon" src="{{data.isFavorited ? icons.starActive : icons.star}}"></image>
+      <text class="stats__text {{data.isFavorited ? 'stats__text--active' : ''}}">{{data.stats.favorites || 0}}</text>
     </view>
   </view>
 </view>

@@ -1,2 +1,213 @@
 <!--pages/detail/detail.wxml-->
-<text>pages/detail/detail.wxml</text>
+<view class="page">
+  <!-- 自定义导航栏 -->
+  <navbar
+    type="white"
+    title="创意详情"
+    show-back="{{true}}"
+    right-text=""
+  >
+    <view slot="right" class="navbar-action" bindtap="onMore">
+      <image class="navbar-action__icon" src="{{icons.more}}"></image>
+    </view>
+  </navbar>
+
+  <!-- 主内容滚动区 -->
+  <scroll-view scroll-y class="content" enhanced show-scrollbar="{{false}}">
+    <!-- ═══════ Hero 区 ═══════ -->
+    <view class="detail-hero" wx:if="{{detail}}">
+      <!-- 作者信息 -->
+      <view class="detail-author">
+        <image class="detail-author__avatar" src="{{author.avatar}}" mode="aspectFill"></image>
+        <view class="detail-author__info">
+          <view class="detail-author__name">
+            {{author.name}}
+            <text wx:if="{{author._openid === currentOpenid}}" class="detail-author__me-badge">我</text>
+          </view>
+          <view class="detail-author__time">{{author.timeLabel}}</view>
+        </view>
+        <view
+          wx:if="{{author._openid !== currentOpenid}}"
+          class="detail-author__follow {{author.isFollowing ? 'detail-author__follow--following' : ''}}"
+          bindtap="onToggleFollow"
+        >{{author.isFollowing ? '已关注' : '关注'}}</view>
+      </view>
+
+      <!-- 正文 -->
+      <view class="detail-body">
+        <view wx:if="{{detail.title}}" class="detail-body__title">{{detail.title}}</view>
+        <view class="detail-body__text">{{detail.content}}</view>
+
+        <!-- 图片展示 -->
+        <view wx:if="{{detail.images.length > 0}}" class="detail-body__images">
+          <image
+            wx:for="{{detail.images}}"
+            wx:key="*this"
+            class="detail-body__image"
+            src="{{item}}"
+            mode="aspectFill"
+            lazy-load
+            catchtap="onPreviewImage"
+            data-index="{{index}}"
+          ></image>
+        </view>
+
+        <!-- 标签 -->
+        <view class="detail-body__tags" wx:if="{{tags.length > 0}}">
+          <view
+            class="tag-chip tag-chip--{{item.type}}"
+            wx:for="{{tags}}"
+            wx:key="text"
+          >{{item.text}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 加载占位 -->
+    <view class="detail-loading" wx:if="{{!detail}}">
+      <view class="detail-loading__text">加载中...</view>
+    </view>
+
+    <!-- ═══════ 认领成果 ═══════ -->
+    <view class="detail-results" wx:if="{{claimResults.length > 0}}">
+      <view class="detail-results__title">认领成果（{{claimResults.length}}）</view>
+      <view class="detail-results__grid">
+        <view
+          class="result-thumb {{item.type === 'video' ? 'result-thumb--video' : ''}}"
+          wx:for="{{claimResults}}"
+          wx:key="_id"
+        >
+          <image wx:if="{{item.thumb}}" class="result-thumb__img" src="{{item.thumb}}" mode="aspectFill"></image>
+          <view wx:else class="result-thumb__placeholder">
+            <view class="result-thumb__icon-img"></view>
+          </view>
+          <view wx:if="{{item.type === 'video'}}" class="result-thumb__play"></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ═══════ CTA ═══════ -->
+    <view class="detail-cta" wx:if="{{detail}}">
+      <button
+        class="cta-btn {{hasClaimed ? 'cta-btn--disabled' : ''}}"
+        bindtap="onClaim"
+        disabled="{{hasClaimed || claiming}}"
+      >{{hasClaimed ? '已认领' : '我要认领这个创意'}}</button>
+      <view class="detail-cta__meta">已有 {{detail.claimCount || 0}} 人认领</view>
+    </view>
+
+    <!-- ═══════ 评论 ═══════ -->
+    <view class="detail-comments" wx:if="{{detail}}">
+      <view class="detail-comments__title">评论（{{commentTotal}}）</view>
+
+      <view
+        class="comment-item"
+        wx:for="{{comments}}"
+        wx:key="_id"
+        wx:for-index="cIndex"
+      >
+        <!-- 评论头像 -->
+        <image class="comment-item__avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+
+        <!-- 评论主体 -->
+        <view class="comment-item__body">
+          <view class="comment-item__name">
+            <text>{{item.name}}</text>
+            <view wx:if="{{item.isAuthor}}" class="comment-item__author-badge">作者</view>
+          </view>
+          <view class="comment-item__text">{{item.text}}</view>
+          <view class="comment-item__meta">
+            <text class="comment-item__time">{{item.time}}</text>
+            <text
+              class="comment-item__action"
+              catchtap="onReply"
+              data-id="{{item._id}}"
+              data-name="{{item.name}}"
+            >回复</text>
+            <view class="comment-item__like" catchtap="onLikeComment">
+              <image class="comment-item__like-icon" src="{{icons.heart}}"></image>
+              <text wx:if="{{item.likeCount > 0}}">{{item.likeCount}}</text>
+            </view>
+          </view>
+
+          <!-- 楼中楼回复 -->
+          <view class="comment-replies" wx:if="{{item.replies.length > 0}}">
+            <block wx:for="{{item.replies}}" wx:for-item="reply" wx:key="_id">
+              <view
+                wx:if="{{item.showAllReplies || index < 2}}"
+                class="comment-reply"
+              >
+                <image class="comment-reply__avatar" src="{{reply.avatar}}" mode="aspectFill"></image>
+                <view class="comment-reply__body">
+                  <view class="comment-reply__name">
+                    <text>{{reply.name}}</text>
+                    <view wx:if="{{reply.isAuthor}}" class="comment-reply__author-badge">作者</view>
+                    <text wx:if="{{reply.replyTo}}" class="comment-reply__reply-to">回复 {{reply.replyTo}}</text>
+                  </view>
+                  <view class="comment-reply__text">{{reply.text}}</view>
+                  <view class="comment-reply__meta">
+                    <text>{{reply.time}}</text>
+                    <text
+                      class="comment-item__action"
+                      catchtap="onReply"
+                      data-id="{{reply._id}}"
+                      data-name="{{reply.name}}"
+                      data-reply-comment-id="{{item._id}}"
+                    >回复</text>
+                    <view class="comment-item__like" wx:if="{{reply.likeCount > 0}}">
+                      <image class="comment-item__like-icon" src="{{icons.heart}}"></image>
+                      <text>{{reply.likeCount}}</text>
+                    </view>
+                  </view>
+                </view>
+              </view>
+            </block>
+
+            <!-- 展开全部回复 -->
+            <view
+              wx:if="{{item.replyTotal > 2 && !item.showAllReplies}}"
+              class="comment-replies__more"
+              catchtap="onToggleReplies"
+              data-index="{{cIndex}}"
+            >
+              <image class="comment-replies__more-icon" src="{{icons.chevronDown}}"></image>
+              <text>展开全部{{item.replyTotal}}条回复</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="comments-empty" wx:if="{{comments.length === 0}}">
+        <view class="comments-empty__icon">💬</view>
+        <view class="comments-empty__text">暂无评论，快来抢沙发</view>
+      </view>
+    </view>
+
+    <!-- 底部留白（避开输入栏） -->
+    <view class="bottom-spacer"></view>
+  </scroll-view>
+
+  <!-- ═══════ 底部输入栏 ═══════ -->
+  <view class="comment-bar">
+    <view wx:if="{{replyTo}}" class="comment-bar__reply-tip">
+      <text>回复 {{replyTo.name}}</text>
+      <view class="comment-bar__reply-cancel" bindtap="onCancelReply">✕</view>
+    </view>
+    <view class="comment-bar__row">
+      <input
+        class="comment-bar__input"
+        type="text"
+        placeholder="{{replyTo ? '回复 ' + replyTo.name : '说点什么吧...'}}"
+        value="{{commentInput}}"
+        bindinput="onCommentInput"
+        confirm-type="send"
+        bindconfirm="onPublishComment"
+      />
+      <view
+        class="comment-bar__publish {{commentInput ? 'comment-bar__publish--active' : ''}}"
+        bindtap="onPublishComment"
+      >发布</view>
+    </view>
+  </view>
+</view>

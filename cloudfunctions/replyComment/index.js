@@ -26,6 +26,7 @@ exports.main = async (event, context) => {
       const addRes = await commentsCol.add({
         data: {
           _openid: OPENID,
+          openid: OPENID,
           creativityId: creativityId,
           content: content,
           parentId: parentId,
@@ -42,10 +43,12 @@ exports.main = async (event, context) => {
       // 若 replyTo 存在，查询被回复评论作者并插入通知
       if (replyTo) {
         const repliedRes = await commentsCol.doc(replyTo).get()
-        if (repliedRes.data && repliedRes.data._openid && repliedRes.data._openid !== OPENID) {
+        const repliedOpenid = repliedRes.data && (repliedRes.data.openid || repliedRes.data._openid)
+        if (repliedOpenid && repliedOpenid !== OPENID) {
           await notificationsCol.add({
             data: {
-              _openid: repliedRes.data._openid,
+              _openid: repliedOpenid,
+              openid: repliedOpenid,
               type: 'comment_reply',
               creativityId: creativityId,
               commentId: addRes._id,

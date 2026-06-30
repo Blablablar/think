@@ -13,7 +13,7 @@ exports.main = async (event, context) => {
 
     if (all === true) {
       await notifications.where({
-        _openid: OPENID,
+        openid: OPENID,
         isRead: false
       }).update({
         data: { isRead: true }

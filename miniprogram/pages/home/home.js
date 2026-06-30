@@ -1,53 +1,60 @@
 // pages/home/home.js
+const P = 'data:image/svg+xml;base64,'
+const SEARCH_ICON = P + 'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2IiBmaWxsPSJub25lIj48Y2lyY2xlIGN4PSI3IiBjeT0iNyIgcj0iNC41IiBzdHJva2U9IiM5OTk5OTkiIHN0cm9rZS13aWR0aD0iMS4zIi8+PGxpbmUgeDE9IjEwLjUiIHkxPSIxMC41IiB4Mj0iMTQuNSIgeTI9IjE0LjUiIHN0cm9rZT0iIzk5OTk5OSIgc3Ryb2tlLXdpZHRoPSIxLjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg=='
+
 Page({
   /**
    * 页面的初始数据
    */
   data: {
-    // Banner 数据
+    searchIcon: SEARCH_ICON,
+
+    // Banner 数据 - 按高保真四色渐变
     banners: [
       {
         id: '1',
         tag: '🔥 本周热门',
         title: '「城市孤独症」摄影企划',
         meta: '68位创作者参与 · 1.2k 作品',
-        gradient: 'linear-gradient(135deg, #534AB7 0%, #42389E 100%)'
+        gradient: 'linear-gradient(135deg, #534AB7 0%, #7C6FD4 30%, #A599E0 60%, #FF6B6B 100%)'
       },
       {
         id: '2',
-        tag: '🌟 推荐活动',
-        title: '「秋日私语」写作挑战',
-        meta: '120位创作者参与 · 320 篇作品',
-        gradient: 'linear-gradient(135deg, #FA9D3B 0%, #FA5151 100%)'
+        tag: '✏️ 限时活动',
+        title: '「夏日创作马拉松」写作挑战',
+        meta: '连续7天创作 · 赢取限定徽章',
+        gradient: 'linear-gradient(135deg, #0D7377 0%, #14A3A8 40%, #32BFC6 70%, #FFA940 100%)'
       },
       {
         id: '3',
-        tag: '🎵 音乐创作',
-        title: '「轻爵士」原创音乐征集',
-        meta: '45位创作者参与 · 89 首作品',
-        gradient: 'linear-gradient(135deg, #07C160 0%, #4ecdc4 100%)'
+        tag: '🎨 征集令',
+        title: '「我的城市一角」插画征集',
+        meta: '投稿截止7月15日 · 42人已参与',
+        gradient: 'linear-gradient(135deg, #6B2C6E 0%, #B04BB5 35%, #E070A0 65%, #FF9A8B 100%)'
       }
     ],
 
-    // 探索分类数据
+    // 探索分类数据 - 按高保真彩色渐变背景
     categories: [
-      { id: 'illustration', name: '插画', icon: '🎨' },
-      { id: 'photography', name: '摄影', icon: '📷' },
-      { id: 'writing', name: '写作', icon: '✍️' },
-      { id: 'music', name: '音乐', icon: '🎵' },
-      { id: 'handcraft', name: '手工', icon: '🧶' },
-      { id: 'lifestyle', name: '生活', icon: '🌱' },
-      { id: 'design', name: '设计', icon: '🎯' },
-      { id: 'video', name: '视频', icon: '🎬' }
+      { id: 'illustration', name: '插画', icon: '🎨', bg: 'linear-gradient(135deg, #FFE4C4, #FFDAB9)' },
+      { id: 'photography', name: '摄影', icon: '📷', bg: 'linear-gradient(135deg, #D4EFFC, #B0E0E6)' },
+      { id: 'writing', name: '写作', icon: '✍️', bg: 'linear-gradient(135deg, #E8F5E9, #C8E6C9)' },
+      { id: 'music', name: '音乐', icon: '🎵', bg: 'linear-gradient(135deg, #F3E5F5, #E1BEE7)' },
+      { id: 'handcraft', name: '手工', icon: '🧶', bg: 'linear-gradient(135deg, #FFF3E0, #FFE0B2)' },
+      { id: 'lifestyle', name: '生活', icon: '🌱', bg: 'linear-gradient(135deg, #FFEBEE, #FFCDD2)' },
+      { id: 'design', name: '设计', icon: '🎯', bg: 'linear-gradient(135deg, #E0F2F1, #B2DFDB)' },
+      { id: 'video', name: '视频', icon: '🎬', bg: 'linear-gradient(135deg, #E8EAF6, #C5CAE9)' }
     ],
 
     // 热门话题数据
     topics: [
-      { id: '1', name: '本周热门' },
-      { id: '2', name: '创意灵感' },
-      { id: '3', name: '摄影技巧' },
-      { id: '4', name: '写作心得' },
-      { id: '5', name: '设计分享' }
+      { id: '1', name: '夏日创作计划', hot: true },
+      { id: '2', name: '每日一画挑战', hot: true },
+      { id: '3', name: '城市速写', hot: false },
+      { id: '4', name: '胶片复兴', hot: false },
+      { id: '5', name: '诗歌创作', hot: false },
+      { id: '6', name: '手工皮具', hot: false },
+      { id: '7', name: '水彩入门', hot: false }
     ],
 
     // 推荐创意列表

@@ -8,24 +8,15 @@
     <!-- 左侧区域 -->
     <view class="navbar__left">
       <view wx:if="{{showBack}}" class="navbar__back" bindtap="onBack">
-        <text class="navbar__back-icon">←</text>
+        <image class="navbar__back-icon" src="{{backIcon}}"></image>
       </view>
       <slot name="left"></slot>
     </view>
 
-    <!-- 中间区域：标题或搜索框 -->
-    <block wx:if="{{showSearch}}">
-      <view class="navbar__search">
-        <text class="navbar__search-icon">🔍</text>
-        <text class="navbar__search-text">{{searchPlaceholder}}</text>
-      </view>
-    </block>
-    <block wx:else>
-      <!-- 标题 -->
-      <view class="navbar__title">
-        <text>{{title}}</text>
-      </view>
-    </block>
+    <!-- 标题 -->
+    <view class="navbar__title">
+      <text>{{title}}</text>
+    </view>
 
     <!-- 右侧区域 -->
     <view class="navbar__right">

@@ -17,7 +17,7 @@ exports.main = async (event, context) => {
     const creativities = db.collection('creativities')
     const follows = db.collection('follows')
 
-    const userRes = await users.where({ _openid: openid }).get()
+    const userRes = await users.where({ openid: openid }).get()
     let userInfo = {}
     if (userRes.data && userRes.data.length > 0) {
       const u = userRes.data[0]
@@ -28,7 +28,7 @@ exports.main = async (event, context) => {
       }
     }
 
-    const creaCount = await creativities.where({ _openid: openid }).count()
+    const creaCount = await creativities.where({ openid: openid }).count()
     const followerCount = await follows.where({ following: openid }).count()
 
     const isFollowedRes = await follows.where({

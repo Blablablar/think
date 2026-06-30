@@ -27,7 +27,7 @@ App({
       })
       if (res.result && res.result.code === 0) {
         this.globalData.userInfo = res.result.data
-        this.globalData.openid = res.result.data._openid
+        this.globalData.openid = res.result.data.openid || res.result.data._openid
         // 缓存标记
         wx.setStorageSync('hasInit', true)
       }

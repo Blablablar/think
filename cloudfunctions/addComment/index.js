@@ -18,10 +18,11 @@ exports.main = async (event, context) => {
       const creativitiesCol = transaction.collection('creativities')
       const notificationsCol = transaction.collection('notifications')
 
-      // 插入评论记录
+      // 插入评论记录（双写 _openid 和 openid，openid 用于关联查询）
       const addRes = await commentsCol.add({
         data: {
           _openid: OPENID,
+          openid: OPENID,
           creativityId: creativityId,
           content: content,
           parentId: parentId || null,
@@ -38,10 +39,11 @@ exports.main = async (event, context) => {
       // 若 replyTo 存在，查询被回复评论作者并插入通知
       if (replyTo) {
         const repliedRes = await commentsCol.doc(replyTo).get()
-        if (repliedRes.data && repliedRes.data._openid && repliedRes.data._openid !== OPENID) {
+        if (repliedRes.data && repliedRes.data.openid && repliedRes.data.openid !== OPENID) {
           await notificationsCol.add({
             data: {
-              _openid: repliedRes.data._openid,
+              _openid: repliedRes.data.openid,
+              openid: repliedRes.data.openid,
               type: 'comment_reply',
               creativityId: creativityId,
               commentId: addRes._id,

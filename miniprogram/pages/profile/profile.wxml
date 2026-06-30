@@ -1,121 +1,157 @@
 <!-- pages/profile/profile.wxml -->
 <view class="page">
-  <!-- 自定义导航栏（透明沉浸式） -->
-  <navbar
-    type="transparent"
-    showBack="{{false}}"
-  ></navbar>
+  <!-- 未登录态：显示登录入口 -->
+  <block wx:if="{{!hasLogin}}">
+    <view class="login-page" style="padding-top: {{statusBarHeight}}px;">
+      <view class="login-hero">
+        <view class="login-avatar-placeholder">👤</view>
+        <view class="login-title">登录后查看你的创意世界</view>
+        <view class="login-sub">发布创意 · 认领灵感 · 收藏喜欢</view>
+        <button class="login-btn" bindtap="onLogin">微信一键登录</button>
+      </view>
+    </view>
+  </block>
 
-  <!-- 顶部渐变背景区 -->
-  <view class="header">
-    <!-- 编辑按钮 -->
-    <view class="edit-btn" bindtap="onEdit">
-      <text class="edit-btn__icon">✏️</text>
+  <!-- 已登录态：沉浸式主页 -->
+  <block wx:else>
+    <!-- ═══════ 沉浸式头部（含状态栏） ═══════ -->
+    <view class="profile-header" style="padding-top: {{statusBarHeight}}px;">
+      <!-- 编辑按钮 -->
+      <view class="profile-edit-btn" style="top: calc({{statusBarHeight}}px + 16rpx);" bindtap="onEditProfile">
+        <image class="profile-edit-btn__icon" src="{{icons.edit}}"></image>
+      </view>
+
+      <!-- 头像 -->
+      <view class="profile-header__avatar">
+        <image wx:if="{{userInfo.avatarUrl}}" class="profile-header__avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+        <view wx:else class="profile-header__avatar-default">{{userInfo.nickName ? userInfo.nickName[0] : 'U'}}</view>
+      </view>
+
+      <!-- 名字 -->
+      <view class="profile-header__name">{{userInfo.nickName || '微信用户'}}</view>
+      <!-- 简介 -->
+      <view class="profile-header__bio" wx:if="{{userInfo.bio}}">{{userInfo.bio}}</view>
     </view>
 
-    <!-- 用户信息 -->
-    <view class="user-info">
-      <image wx:if="{{userInfo.avatar}}" class="user-info__avatar" src="{{userInfo.avatar}}" mode="aspectFill"></image>
-      <view wx:else class="user-info__avatar user-info__avatar--default">👤</view>
-
-      <view class="user-info__detail">
-        <text class="user-info__name">{{userInfo.name || '微信用户'}}</text>
-        <text wx:if="{{userInfo.id}}" class="user-info__id">ID: {{userInfo.id}}</text>
-        <text wx:if="{{userInfo.bio}}" class="user-info__bio">{{userInfo.bio}}</text>
+    <!-- ═══════ 浮层数据卡 ═══════ -->
+    <view class="profile-stats">
+      <view class="stat-card">
+        <view class="stat-item">
+          <text class="stat-item__value">{{stats.posts}}</text>
+          <text class="stat-item__label">创意</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <text class="stat-item__value">{{stats.claims}}</text>
+          <text class="stat-item__label">认领</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <text class="stat-item__value">{{stats.favorites}}</text>
+          <text class="stat-item__label">收藏</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <text class="stat-item__value">{{stats.likes}}</text>
+          <text class="stat-item__label">获赞</text>
+        </view>
       </view>
     </view>
 
-    <!-- 数据卡片 -->
-    <view class="stats-card">
-      <view class="stats-card__item" bindtap="onStatsClick" data-type="posts">
-        <text class="stats-card__value">{{stats.posts}}</text>
-        <text class="stats-card__label">发布</text>
-      </view>
-      <view class="stats-card__divider"></view>
-      <view class="stats-card__item" bindtap="onStatsClick" data-type="following">
-        <text class="stats-card__value">{{stats.following}}</text>
-        <text class="stats-card__label">关注</text>
-      </view>
-      <view class="stats-card__divider"></view>
-      <view class="stats-card__item" bindtap="onStatsClick" data-type="followers">
-        <text class="stats-card__value">{{stats.followers}}</text>
-        <text class="stats-card__label">粉丝</text>
-      </view>
+    <!-- ═══════ 内容区：Tab + 列表 ═══════ -->
+    <view class="profile-tabs">
+      <view
+        class="profile-tab {{activeTab === 0 ? 'profile-tab--active' : ''}}"
+        bindtap="onTabChange"
+        data-index="0"
+      >我的创意</view>
+      <view
+        class="profile-tab {{activeTab === 1 ? 'profile-tab--active' : ''}}"
+        bindtap="onTabChange"
+        data-index="1"
+      >我的认领</view>
+      <view
+        class="profile-tab {{activeTab === 2 ? 'profile-tab--active' : ''}}"
+        bindtap="onTabChange"
+        data-index="2"
+      >我的收藏</view>
     </view>
-  </view>
 
-  <!-- 内容 Tab -->
-  <view class="content-tabs">
-    <view
-      class="content-tab {{activeTab === 0 ? 'content-tab--active' : ''}}"
-      bindtap="onTabChange"
-      data-index="0"
-    >
-      <text class="content-tab__text">我的创意</text>
-      <view wx:if="{{activeTab === 0}}" class="content-tab__indicator"></view>
-    </view>
-    <view
-      class="content-tab {{activeTab === 1 ? 'content-tab--active' : ''}}"
-      bindtap="onTabChange"
-      data-index="1"
-    >
-      <text class="content-tab__text">认领</text>
-      <view wx:if="{{activeTab === 1}}" class="content-tab__indicator"></view>
-    </view>
-    <view
-      class="content-tab {{activeTab === 2 ? 'content-tab--active' : ''}}"
-      bindtap="onTabChange"
-      data-index="2"
-    >
-      <text class="content-tab__text">收藏</text>
-      <view wx:if="{{activeTab === 2}}" class="content-tab__indicator"></view>
-    </view>
-  </view>
+    <view class="content-list">
+      <block wx:if="{{contentList.length > 0}}">
+        <creativity-card
+          wx:for="{{contentList}}"
+          wx:key="_id"
+          data="{{item}}"
+          bind:click="onCardClick"
+          bind:like="onLike"
+          bind:favorite="onFavorite"
+        ></creativity-card>
+      </block>
 
-  <!-- 内容列表 -->
-  <scroll-view
-    scroll-y
-    class="content-list"
-  >
-    <block wx:if="{{contentList.length > 0}}">
-      <creativity-card
-        wx:for="{{contentList}}"
-        wx:key="_id"
-        data="{{item}}"
-        bind:click="onCardClick"
-        bind:like="onLike"
-        bind:favorite="onFavorite"
-      ></creativity-card>
+      <view class="empty-state" wx:if="{{contentList.length === 0 && !loading}}">
+        <view class="empty-icon">📝</view>
+        <view class="empty-text">暂无内容</view>
+      </view>
+
       <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
-    </block>
+    </view>
 
-    <empty-state
-      wx:if="{{contentList.length === 0 && !loading}}"
-      icon="📝"
-      text="暂无内容"
-      sub-text="快去发布第一个创意吧"
-    ></empty-state>
-  </scroll-view>
+    <!-- ═══════ 常用功能 ═══════ -->
+    <view class="section-heading">常用功能</view>
+    <view class="profile-menu">
+      <view
+        class="menu-item"
+        wx:for="{{menuCommon}}"
+        wx:key="type"
+        bindtap="onFunctionClick"
+        data-type="{{item.type}}"
+      >
+        <view class="menu-item__icon-wrap">
+          <image class="menu-item__icon" src="{{item.type === 'drafts' ? icons.draft : icons.feedback}}"></image>
+        </view>
+        <text class="menu-item__label">{{item.label}}</text>
+        <image class="menu-item__arrow" src="{{icons.arrow}}"></image>
+      </view>
+    </view>
 
-  <!-- 常用功能（简易版） -->
-  <view class="functions">
-    <view class="functions__title">常用功能</view>
-    <view class="functions__list">
-      <view class="functions__item" bindtap="onFunctionClick" data-type="inspiration">
-        <text class="functions__item-icon">💡</text>
-        <text class="functions__item-text">创作灵感</text>
+    <!-- ═══════ 其他 ═══════ -->
+    <view class="section-heading">其他</view>
+    <view class="profile-menu">
+      <view
+        class="menu-item"
+        wx:for="{{menuOther}}"
+        wx:key="type"
+        bindtap="onFunctionClick"
+        data-type="{{item.type}}"
+      >
+        <view class="menu-item__icon-wrap">
+          <image class="menu-item__icon" src="{{item.type === 'feedback' ? icons.feedback : icons.settings}}"></image>
+        </view>
+        <text class="menu-item__label">{{item.label}}</text>
+        <image class="menu-item__arrow" src="{{icons.arrow}}"></image>
       </view>
-      <view class="functions__item" bindtap="onFunctionClick" data-type="drafts">
-        <text class="functions__item-icon">📄</text>
-        <text class="functions__item-text">草稿箱</text>
-      </view>
-      <view class="functions__item" bindtap="onFunctionClick" data-type="history">
-        <text class="functions__item-icon">🕐</text>
-        <text class="functions__item-text">浏览记录</text>
-      </view>
-      <view class="functions__item" bindtap="onFunctionClick" data-type="settings">
-        <text class="functions__item-icon">⚙️</text>
-        <text class="functions__item-text">设置</text>
+    </view>
+
+    <!-- 底部留白 -->
+    <view class="page-bottom"></view>
+  </block>
+
+  <!-- ═══════ 编辑资料弹窗 ═══════ -->
+  <view class="edit-mask" wx:if="{{editVisible}}" bindtap="onCloseEdit">
+    <view class="edit-dialog" catchtap="onStopPropagation">
+      <view class="edit-title">{{isFirstLogin ? '完善个人资料' : '编辑个人资料'}}</view>
+      <button class="edit-avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onEditChooseAvatar">
+        <image wx:if="{{editAvatarUrl}}" class="edit-avatar-img" src="{{editAvatarUrl}}" mode="aspectFill"></image>
+        <view wx:else class="edit-avatar-placeholder">
+          <view class="edit-avatar-add">+</view>
+          <view class="edit-avatar-tip">点击选择头像</view>
+        </view>
+      </button>
+      <input class="edit-nickname" type="nickname" placeholder="请输入昵称" value="{{editNickName}}" bindinput="onEditNicknameInput" />
+      <view class="edit-actions">
+        <button wx:if="{{!isFirstLogin}}" class="edit-cancel-btn" bindtap="onCloseEdit">取消</button>
+        <button class="edit-save-btn" bindtap="onSaveProfile" loading="{{savingProfile}}">{{isFirstLogin ? '完成' : '保存'}}</button>
       </view>
     </view>
   </view>

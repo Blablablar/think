@@ -32,6 +32,7 @@ exports.main = async (event, context) => {
     const now = new Date();
     const record = {
       _openid: OPENID,
+      openid: OPENID,
       content,
       voiceUrl,
       images,

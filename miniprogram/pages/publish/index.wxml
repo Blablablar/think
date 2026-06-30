@@ -9,60 +9,81 @@
   ></navbar>
 
   <scroll-view scroll-y class="content" enhanced show-scrollbar="{{false}}">
-    <!-- 正文输入区 -->
-    <view class="input-area">
-      <textarea
-        class="text-input"
-        placeholder="记录你的灵感..."
-        placeholder-class="placeholder"
-        value="{{content}}"
-        bindinput="onContentInput"
-        maxlength="{{maxContent}}"
-        auto-height
-        cursor-spacing="100"
-      ></textarea>
-
-      <!-- 已插入的图片 -->
-      <view class="image-list" wx:if="{{images.length > 0}}">
-        <view class="image-item" wx:for="{{images}}" wx:key="index">
-          <image class="image-preview" src="{{item}}" mode="aspectFill"></image>
-          <view class="image-overlay"></view>
-          <view class="image-delete" catchtap="onDeleteImage" data-index="{{index}}">✕</view>
-        </view>
-
-        <!-- 插入图片入口 -->
-        <view class="add-image-btn" wx:if="{{images.length < 9}}" bindtap="onChooseImage">
-          <view class="add-icon">+</view>
-          <view class="add-text">插入图片</view>
-        </view>
+    <!-- 标题字段 -->
+    <view class="field">
+      <view class="field__label">
+        <view class="field__dot"></view>
+        <text>标题</text>
       </view>
-
-      <!-- 无图片时的插入图片入口 -->
-      <view class="insert-image" wx:if="{{images.length === 0}}" bindtap="onChooseImage">
-        <view class="insert-line"></view>
-        <view class="insert-text">点击插入图片</view>
-        <view class="insert-line"></view>
+      <input
+        class="title-input"
+        placeholder="给你的创意起个名字吧"
+        placeholder-class="placeholder"
+        value="{{title}}"
+        bindinput="onTitleInput"
+        maxlength="{{maxTitle}}"
+      />
+      <view class="field__hint field__hint--right">
+        <text>{{title.length}}/{{maxTitle}}</text>
       </view>
     </view>
 
-    <!-- 分类标签选择 -->
-    <view class="tag-section">
-      <view class="tag-list">
+    <!-- 正文字段 -->
+    <view class="field">
+      <view class="field__label">
+        <view class="field__dot"></view>
+        <text>正文</text>
+      </view>
+      <view class="editor">
+        <textarea
+          class="editor__input"
+          placeholder="记录你的灵感..."
+          placeholder-class="placeholder"
+          value="{{content}}"
+          bindinput="onContentInput"
+          maxlength="{{maxContent}}"
+          auto-height
+          cursor-spacing="100"
+        ></textarea>
+
+        <!-- 已插入的图片 -->
+        <view class="image-list" wx:if="{{images.length > 0}}">
+          <view class="image-item" wx:for="{{images}}" wx:key="index">
+            <image class="image-preview" src="{{item}}" mode="aspectFill"></image>
+            <view class="image-delete" catchtap="onDeleteImage" data-index="{{index}}">✕</view>
+          </view>
+        </view>
+
+        <!-- 插入图片入口 -->
+        <view class="inline-add" wx:if="{{images.length < 9}}" bindtap="onChooseImage">
+          <text class="inline-add__icon">+</text>
+          <text>在此处插入图片</text>
+        </view>
+      </view>
+      <view class="field__hint">
+        <text wx:if="{{showDraftTip}}">已自动保存草稿</text>
+        <text class="field__hint--right">{{content.length}}/{{maxContent}}</text>
+      </view>
+    </view>
+
+    <!-- 分类标签字段 -->
+    <view class="field">
+      <view class="field__label">
+        <view class="field__dot"></view>
+        <text>分类标签</text>
+      </view>
+      <view class="tag-grid">
         <view
-          class="tag-item {{selectedTags.indexOf(item) > -1 ? 'tag-item--active' : ''}}"
+          class="tag-pill {{selectedTags.indexOf(item) > -1 ? 'tag-pill--selected' : ''}}"
           wx:for="{{tagOptions}}"
           wx:key="*this"
           bindtap="onToggleTag"
           data-tag="{{item}}"
-        >
-          {{item}}
-        </view>
+        >{{item}}</view>
       </view>
-    </view>
-
-    <!-- 草稿提示 -->
-    <view class="draft-tip" wx:if="{{showDraftTip}}">
-      <text>已自动保存草稿</text>
+      <view class="field__hint">
+        <text>为创意添加一个分类，更容易被发现</text>
+      </view>
     </view>
   </scroll-view>
 

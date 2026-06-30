@@ -2,8 +2,8 @@
   "pages": [
     "pages/home/home",
     "pages/following/following",
-    "pages/publish/publish",
-    "pages/messages/messages",
+    "pages/publish/index",
+    "pages/messages/index",
     "pages/profile/profile",
     "pages/detail/detail"
   ],
@@ -27,11 +27,11 @@
         "text": "关注"
       },
       {
-        "pagePath": "pages/publish/publish",
+        "pagePath": "pages/publish/index",
         "text": "发布"
       },
       {
-        "pagePath": "pages/messages/messages",
+        "pagePath": "pages/messages/index",
         "text": "消息"
       },
       {

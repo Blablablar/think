@@ -25,7 +25,7 @@ exports.main = async (event, context) => {
       }
 
       // 校验权限
-      if (comment._openid !== OPENID) {
+      if ((comment.openid || comment._openid) !== OPENID) {
         throw new Error('无权删除他人评论')
       }
 

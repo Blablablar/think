@@ -12,7 +12,7 @@ exports.main = async (event, context) => {
   try {
     // 查询我的有效认领
     const countRes = await db.collection('claims').where({
-      _openid: OPENID,
+      openid: OPENID,
       status: 'active'
     }).count()
 
@@ -20,7 +20,7 @@ exports.main = async (event, context) => {
 
     const listRes = await db.collection('claims')
       .where({
-        _openid: OPENID,
+        openid: OPENID,
         status: 'active'
       })
       .orderBy('claimedAt', 'desc')

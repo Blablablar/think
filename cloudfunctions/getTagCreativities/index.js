@@ -38,18 +38,18 @@ exports.main = async (event, context) => {
     }
 
     // 批量查询作者信息
-    const openids = [...new Set(creativities.map(c => c._openid))];
+    const openids = [...new Set(creativities.map(c => c.openid || c._openid))];
     const authorsResult = await db.collection('users')
-      .where({ _openid: _.in(openids) })
+      .where({ openid: _.in(openids) })
       .get();
     const authorMap = {};
-    authorsResult.data.forEach(u => { authorMap[u._openid] = u; });
+    authorsResult.data.forEach(u => { authorMap[u.openid] = u; });
 
     // 批量查询当前用户的点赞记录
     const creativityIds = creativities.map(c => c._id);
     const likesResult = await db.collection('userLikes')
       .where({
-        _openid: OPENID,
+        openid: OPENID,
         creativityId: _.in(creativityIds)
       })
       .get();
@@ -58,7 +58,7 @@ exports.main = async (event, context) => {
 
     // 合并数据
     const list = creativities.map(item => {
-      const author = authorMap[item._openid] || null;
+      const author = authorMap[item.openid || item._openid] || null;
       const likeInfo = likeMap[item._id] || null;
       return {
         ...item,

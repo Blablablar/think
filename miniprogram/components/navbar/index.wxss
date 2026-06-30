@@ -27,6 +27,7 @@
   bottom: 0;
   display: flex;
   align-items: center;
+  z-index: 2;
 }
 
 /* 返回按钮 */
@@ -40,7 +41,8 @@
 }
 
 .navbar__back-icon {
-  font-size: 40rpx;
+  width: 40rpx;
+  height: 40rpx;
 }
 
 /* 标题 */
@@ -52,6 +54,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 1.25;
 }
 
 /* 右侧区域 */
@@ -62,6 +65,7 @@
   bottom: 0;
   display: flex;
   align-items: center;
+  z-index: 2;
 }
 
 .navbar__right-text {
@@ -69,65 +73,35 @@
   font-weight: 500;
 }
 
-/* 搜索框 */
-.navbar__search {
-  display: flex;
-  align-items: center;
-  height: 72rpx;      /* 36px */
-  padding: 0 24rpx;   /* 12px */
-  background: rgba(247, 248, 250, 0.9);
-  border-radius: 36rpx;
-  flex: 1;
-  margin: 0 80rpx;   /* 左右留出空间给可能的前置/后置元素 */
-}
-
-.navbar__search-icon {
-  margin-right: 8rpx;
-  font-size: 28rpx;
-}
-
-.navbar__search-text {
-  font-size: 28rpx;    /* 14px */
-  color: #CCCCCC;
-}
-
 /* ============================================
-   导航栏类型样式
+   导航栏类型样式（按设计系统）
    ============================================ */
 
-/* 紫色底 */
+/* 紫色底 - 纯色 #534AB7 */
 .navbar--purple {
-  background: linear-gradient(135deg, #534AB7 0%, #42389E 100%);
+  background: #534ab7;
 }
 
 .navbar--purple .navbar__title {
-  color: #FFFFFF;
-}
-
-.navbar--purple .navbar__back-icon {
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .navbar--purple .navbar__right-text {
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 /* 白色底 */
 .navbar--white {
-  background: #FFFFFF;
-  border-bottom: 2rpx solid #E8E8E8;
+  background: #ffffff;
+  border-bottom: 1rpx solid #f0f0f0;
 }
 
 .navbar--white .navbar__title {
-  color: #1A1A1A;
-}
-
-.navbar--white .navbar__back-icon {
-  color: #1A1A1A;
+  color: #1a1a1a;
 }
 
 .navbar--white .navbar__right-text {
-  color: #534AB7;
+  color: #534ab7;
 }
 
 /* 透明沉浸式 */
@@ -136,15 +110,11 @@
 }
 
 .navbar--transparent .navbar__title {
-  color: #1A1A1A;
-}
-
-.navbar--transparent .navbar__back-icon {
-  color: #1A1A1A;
+  color: #1a1a1a;
 }
 
 .navbar--transparent .navbar__right-text {
-  color: #534AB7;
+  color: #534ab7;
 }
 
 /* 占位元素 */

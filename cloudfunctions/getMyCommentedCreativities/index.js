@@ -12,7 +12,7 @@ exports.main = async (event, context) => {
   try {
     // 查询当前用户的所有评论
     const commentsRes = await db.collection('comments').where({
-      _openid: OPENID
+      openid: OPENID
     }).get()
 
     // 去重拿到 creativityId 列表
@@ -41,20 +41,20 @@ exports.main = async (event, context) => {
     }).orderBy('createdAt', 'desc').get()
 
     // lookup users 作者信息
-    const authorOpenids = creativitiesRes.data.map(item => item._openid).filter(Boolean)
+    const authorOpenids = creativitiesRes.data.map(item => item.openid || item._openid).filter(Boolean)
     let usersMap = {}
     if (authorOpenids.length > 0) {
       const usersRes = await db.collection('users').where({
-        _openid: _.in(authorOpenids)
+        openid: _.in(authorOpenids)
       }).get()
       usersRes.data.forEach(item => {
-        usersMap[item._openid] = item
+        usersMap[item.openid] = item
       })
     }
 
     const list = creativitiesRes.data.map(item => ({
       ...item,
-      author: usersMap[item._openid] || null
+      author: usersMap[item.openid || item._openid] || null
     }))
 
     const hasMore = skip + list.length < total

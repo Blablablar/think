@@ -32,7 +32,7 @@ exports.main = async (event, context) => {
     if (!claim) {
       return { code: -1, message: '认领记录不存在', data: null }
     }
-    if (claim._openid !== OPENID) {
+    if ((claim.openid || claim._openid) !== OPENID) {
       return { code: -1, message: '无权操作此认领记录', data: null }
     }
     if (claim.status !== 'active') {
@@ -54,6 +54,7 @@ exports.main = async (event, context) => {
         creativityId,
         claimId,
         _openid: OPENID,
+        openid: OPENID,
         description,
         screenshots,
         videoUrl: videoUrl || '',
@@ -75,10 +76,11 @@ exports.main = async (event, context) => {
     // 通知创意作者
     const creativityRes = await db.collection('creativities').doc(creativityId).get()
     const creativity = creativityRes.data
-    if (creativity && creativity._openid) {
+    if (creativity && (creativity.openid || creativity._openid)) {
       await db.collection('notifications').add({
         data: {
-          _openid: creativity._openid,
+          _openid: creativity.openid || creativity._openid,
+          openid: creativity.openid || creativity._openid,
           fromOpenid: OPENID,
           type: 'claim',
           creativityId,

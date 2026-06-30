@@ -15,7 +15,7 @@ exports.main = async (event, context) => {
 
     // 查 favorites 集合是否已收藏（_openid + creativityId）
     const existing = await db.collection('favorites')
-      .where({ _openid: OPENID, creativityId: creativityId })
+      .where({ openid: OPENID, creativityId: creativityId })
       .get();
 
     if (existing.data.length > 0) {
@@ -30,6 +30,8 @@ exports.main = async (event, context) => {
       // 未收藏则插入记录并 creativities.favoriteCount +1
       await db.collection('favorites').add({
         data: {
+          _openid: OPENID,
+          openid: OPENID,
           creativityId: creativityId,
           createdAt: new Date()
         }

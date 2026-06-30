@@ -1,11 +1,7 @@
 <!-- pages/home/home.wxml -->
 <view class="page">
-  <!-- 自定义导航栏（带搜索框） -->
-  <navbar
-    type="purple"
-    showSearch="{{true}}"
-    searchPlaceholder="搜索灵感..."
-  ></navbar>
+  <!-- 自定义导航栏 -->
+  <navbar type="purple" title="首页"></navbar>
 
   <!-- 页面内容 -->
   <scroll-view
@@ -16,6 +12,12 @@
     refresher-triggered="{{refreshing}}"
     bindrefresherrefresh="onPullDownRefresh"
   >
+    <!-- 搜索框 -->
+    <view class="search-bar">
+      <image class="search-bar__icon" src="{{searchIcon}}"></image>
+      <text class="search-bar__text">搜索灵感、创作者或话题</text>
+    </view>
+
     <!-- Banner 轮播 -->
     <view class="banner-section">
       <swiper
@@ -24,7 +26,7 @@
         circular
         interval="3500"
         indicator-dots
-        indicator-color="rgba(255, 255, 255, 0.5)"
+        indicator-color="rgba(255, 255, 255, 0.4)"
         indicator-active-color="#FFFFFF"
       >
         <swiper-item wx:for="{{banners}}" wx:key="id">
@@ -39,6 +41,10 @@
 
     <!-- 探索分类 8宫格 -->
     <view class="category-section">
+      <view class="section-header">
+        <text class="section-header__title">探索分类</text>
+        <text class="section-header__more">全部</text>
+      </view>
       <view class="category-grid">
         <view
           class="category-item"
@@ -47,7 +53,9 @@
           bindtap="onCategoryClick"
           data-id="{{item.id}}"
         >
-          <view class="category-icon">{{item.icon}}</view>
+          <view class="category-icon" style="background: {{item.bg}};">
+            <text>{{item.icon}}</text>
+          </view>
           <view class="category-name">{{item.name}}</view>
         </view>
       </view>
@@ -55,20 +63,29 @@
 
     <!-- 热门话题 Chip列表 -->
     <view class="topics-section">
-      <scroll-view scroll-x class="topics-scroll">
-        <view class="topics-list">
-          <view
-            class="topic-chip {{index === 0 ? 'topic-chip--active' : ''}}"
-            wx:for="{{topics}}"
-            wx:key="id"
-            bindtap="onTopicClick"
-            data-id="{{item.id}}"
-          >
-            <text class="topic-chip__icon">🔥</text>
-            <text class="topic-chip__text">{{item.name}}</text>
-          </view>
+      <view class="section-header">
+        <text class="section-header__title">热门话题</text>
+        <text class="section-header__more">更多</text>
+      </view>
+      <view class="topic-list">
+        <view
+          class="topic-chip"
+          wx:for="{{topics}}"
+          wx:key="id"
+          bindtap="onTopicClick"
+          data-id="{{item.id}}"
+        >
+          <text wx:if="{{item.hot}}" class="topic-chip__hot">🔥</text>
+          <text class="topic-chip__text">{{item.name}}</text>
         </view>
-      </scroll-view>
+      </view>
+    </view>
+
+    <!-- Feed 分隔标题 -->
+    <view class="feed-header">
+      <view class="feed-header__line"></view>
+      <text class="feed-header__text">为你推荐</text>
+      <view class="feed-header__line"></view>
     </view>
 
     <!-- 推荐创意 Feed流 -->

@@ -13,11 +13,11 @@ exports.main = async (event, context) => {
     const skip = (page - 1) * pageSize;
 
     // 查 favorites 集合过滤 _openid === OPENID，按 createdAt 降序分页
-    const countResult = await db.collection('favorites').where({ _openid: OPENID }).count();
+    const countResult = await db.collection('favorites').where({ openid: OPENID }).count();
     const total = countResult.total;
 
     const favoritesResult = await db.collection('favorites')
-      .where({ _openid: OPENID })
+      .where({ openid: OPENID })
       .orderBy('createdAt', 'desc')
       .skip(skip)
       .limit(pageSize)
@@ -39,23 +39,23 @@ exports.main = async (event, context) => {
     const authorOpenids = [];
     creativitiesResult.data.forEach(c => {
       creativityMap[c._id] = c;
-      if (c._openid && authorOpenids.indexOf(c._openid) === -1) {
-        authorOpenids.push(c._openid);
+      if ((c.openid || c._openid) && authorOpenids.indexOf(c.openid || c._openid) === -1) {
+        authorOpenids.push(c.openid || c._openid);
       }
     });
 
     // 关联 users 集合查作者信息
     const authorsResult = await db.collection('users')
-      .where({ _openid: _.in(authorOpenids) })
+      .where({ openid: _.in(authorOpenids) })
       .get();
     const authorMap = {};
     authorsResult.data.forEach(u => {
-      authorMap[u._openid] = u;
+      authorMap[u.openid] = u;
     });
 
     // 关联 userLikes 集合查当前用户点赞状态
     const likesResult = await db.collection('userLikes')
-      .where({ _openid: OPENID, creativityId: _.in(creativityIds) })
+      .where({ openid: OPENID, creativityId: _.in(creativityIds) })
       .get();
     const likeMap = {};
     likesResult.data.forEach(l => {
@@ -68,7 +68,7 @@ exports.main = async (event, context) => {
       if (!creativity) {
         return null;
       }
-      const author = authorMap[creativity._openid] || null;
+      const author = authorMap[creativity.openid || creativity._openid] || null;
       const likeInfo = likeMap[creativity._id];
       return {
         ...creativity,

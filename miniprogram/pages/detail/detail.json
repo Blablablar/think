@@ -1,6 +1,6 @@
 {
   "usingComponents": {
-    "creativity-card": "/components/creativity-card/index"
+    "navbar": "/components/navbar/index"
   },
   "navigationStyle": "custom"
 }

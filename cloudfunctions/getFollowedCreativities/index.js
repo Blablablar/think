@@ -22,26 +22,26 @@ exports.main = async (event, context) => {
     }
 
     const countRes = await creativities.where({
-      _openid: _.in(followingList)
+      openid: _.in(followingList)
     }).count()
     const total = countRes.total
 
     const listRes = await creativities.where({
-      _openid: _.in(followingList)
+      openid: _.in(followingList)
     }).orderBy('createdAt', 'desc').skip(skip).limit(pageSize).get()
 
-    const openids = [...new Set(listRes.data.map(item => item._openid))]
+    const openids = [...new Set(listRes.data.map(item => item.openid || item._openid))]
     const userMap = {}
     if (openids.length > 0) {
-      const usersRes = await users.where({ _openid: _.in(openids) }).get()
+      const usersRes = await users.where({ openid: _.in(openids) }).get()
       usersRes.data.forEach(u => {
-        userMap[u._openid] = u
+        userMap[u.openid] = u
       })
     }
 
     const list = listRes.data.map(item => ({
       ...item,
-      author: userMap[item._openid] || null
+      author: userMap[item.openid || item._openid] || null
     }))
 
     const hasMore = skip + list.length < total

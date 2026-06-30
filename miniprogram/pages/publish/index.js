@@ -5,11 +5,13 @@ const { MAX_CONTENT_LENGTH } = require('../../utils/constants.js')
 
 Page({
   data: {
+    title: '',
     content: '',
     images: [],
     selectedTags: [],
     publishing: false,
     maxContent: MAX_CONTENT_LENGTH,
+    maxTitle: 30,
     showDraftTip: false,
     tagOptions: ['插画', '摄影', '写作', '音乐', '手工', '生活', '设计', '视频']
   },
@@ -19,6 +21,7 @@ Page({
     const draft = wx.getStorageSync('publish_draft')
     if (draft) {
       this.setData({
+        title: draft.title || '',
         content: draft.content || '',
         images: draft.images || [],
         selectedTags: draft.tags || [],
@@ -29,6 +32,11 @@ Page({
         this.setData({ showDraftTip: false })
       }, 3000)
     }
+  },
+
+  onTitleInput(e) {
+    this.setData({ title: e.detail.value.slice(0, this.data.maxTitle) })
+    this.autoSaveDraft()
   },
 
   onContentInput(e) {
@@ -82,7 +90,7 @@ Page({
 
   onCancel() {
     // 如果有内容，提示是否保存草稿
-    if (this.data.content.trim() || this.data.images.length > 0) {
+    if (this.data.title.trim() || this.data.content.trim() || this.data.images.length > 0) {
       wx.showModal({
         title: '提示',
         content: '是否保存草稿？',
@@ -102,14 +110,14 @@ Page({
 
   // 自动保存草稿
   autoSaveDraft() {
-    const { content, images, selectedTags } = this.data
-    wx.setStorageSync('publish_draft', { content, images, tags: selectedTags })
+    const { title, content, images, selectedTags } = this.data
+    wx.setStorageSync('publish_draft', { title, content, images, tags: selectedTags })
   },
 
   // 手动保存草稿
   saveDraft() {
-    const { content, images, selectedTags } = this.data
-    wx.setStorageSync('publish_draft', { content, images, tags: selectedTags })
+    const { title, content, images, selectedTags } = this.data
+    wx.setStorageSync('publish_draft', { title, content, images, tags: selectedTags })
     this.setData({ showDraftTip: true })
     setTimeout(() => {
       this.setData({ showDraftTip: false })
@@ -137,8 +145,12 @@ Page({
   },
 
   async onPublish() {
-    const { content, images, selectedTags } = this.data
+    const { title, content, images, selectedTags } = this.data
 
+    if (!title.trim()) {
+      showToast('请输入标题')
+      return
+    }
     if (!content.trim()) {
       showToast('请输入创意内容')
       return
@@ -161,6 +173,7 @@ Page({
 
       // 2. 调用云函数发布创意
       await callFunction('publishCreativity', {
+        title: title.trim(),
         content: content.trim(),
         images: fileIDs,
         tags: selectedTags
@@ -168,7 +181,7 @@ Page({
       hideLoading()
       showToast('发布成功', 'success')
       // 清空数据和草稿
-      this.setData({ content: '', images: [], selectedTags: [] })
+      this.setData({ title: '', content: '', images: [], selectedTags: [] })
       wx.removeStorageSync('publish_draft')
       setTimeout(() => {
         wx.switchTab({ url: '/pages/home/home' })

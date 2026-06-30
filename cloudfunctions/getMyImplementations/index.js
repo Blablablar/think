@@ -12,7 +12,7 @@ exports.main = async (event, context) => {
   try {
     // 查询总数
     const countRes = await db.collection('implementations').where({
-      _openid: OPENID
+      openid: OPENID
     }).count()
 
     const total = countRes.total
@@ -20,7 +20,7 @@ exports.main = async (event, context) => {
     // 分页查询
     const listRes = await db.collection('implementations')
       .where({
-        _openid: OPENID
+        openid: OPENID
       })
       .orderBy('createdAt', 'desc')
       .skip((page - 1) * pageSize)
@@ -30,22 +30,22 @@ exports.main = async (event, context) => {
     const list = listRes.data
 
     // lookup users 拿作者信息
-    const openids = [...new Set(list.map(item => item._openid))]
+    const openids = [...new Set(list.map(item => item.openid || item._openid))]
     let userMap = {}
 
     if (openids.length > 0) {
       const usersRes = await db.collection('users').where({
-        _openid: _.in(openids)
+        openid: _.in(openids)
       }).get()
       userMap = usersRes.data.reduce((acc, cur) => {
-        acc[cur._openid] = cur
+        acc[cur.openid] = cur
         return acc
       }, {})
     }
 
     const resultList = list.map(item => ({
       ...item,
-      author: userMap[item._openid] || null
+      author: userMap[item.openid || item._openid] || null
     }))
 
     const hasMore = (page - 1) * pageSize + list.length < total

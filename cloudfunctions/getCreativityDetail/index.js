@@ -25,9 +25,9 @@ exports.main = async (event, context) => {
 
     // 查询作者信息
     let author = null;
-    if (item._openid) {
+    if (item.openid || item._openid) {
       const authorResult = await db.collection('users')
-        .where({ _openid: item._openid })
+        .where({ openid: item.openid || item._openid })
         .get();
       if (authorResult.data && authorResult.data.length > 0) {
         author = authorResult.data[0];
@@ -38,7 +38,7 @@ exports.main = async (event, context) => {
     let likeInfo = null;
     const likeResult = await db.collection('userLikes')
       .where({
-        _openid: OPENID,
+        openid: OPENID,
         creativityId: id
       })
       .get();

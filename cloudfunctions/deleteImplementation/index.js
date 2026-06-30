@@ -20,7 +20,7 @@ exports.main = async (event, context) => {
     if (!impl) {
       return { code: -1, message: '实现成果不存在', data: null }
     }
-    if (impl._openid !== OPENID) {
+    if ((impl.openid || impl._openid) !== OPENID) {
       return { code: -1, message: '无权操作此实现成果', data: null }
     }
 
